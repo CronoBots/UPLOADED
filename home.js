@@ -416,7 +416,8 @@
     });
 
     /* Suivi de la souris : le PC et le téléphone s'inclinent vers le curseur
-       (profondeur 3D). Seul mouvement de la maquette : elle ne flotte plus. */
+       (profondeur 3D). Seul mouvement de la maquette : ni flottement ni zoom, et le
+       téléphone s'incline autant que le PC pour que son écran reste bien lisible. */
     if (finePointer && !prefersReduced) {
       var stage = showcase.querySelector(".showcase-stage");
       var laptop = showcase.querySelector(".laptop-device");
@@ -430,7 +431,7 @@
           var rx = clamp((lastE.clientX - sr.left) / sr.width - 0.5);
           var ry = clamp((lastE.clientY - sr.top) / sr.height - 0.5);
           laptop.style.transform = "rotateY(" + (rx * 9).toFixed(2) + "deg) rotateX(" + (-ry * 6).toFixed(2) + "deg)";
-          phone.style.transform = "translateZ(40px) rotateY(" + (rx * 15).toFixed(2) + "deg) rotateX(" + (-ry * 9).toFixed(2) + "deg)";
+          phone.style.transform = "rotateY(" + (rx * 9).toFixed(2) + "deg) rotateX(" + (-ry * 6).toFixed(2) + "deg)";
         };
         window.addEventListener("pointermove", function (e) { lastE = e; if (!ticking) { ticking = true; requestAnimationFrame(apply); } }, { passive: true });
         document.addEventListener("mouseleave", function () { laptop.style.transform = ""; phone.style.transform = ""; });

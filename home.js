@@ -337,11 +337,15 @@
       { n: "Boutique & réservation",
         i: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
         d: "Vendre vos produits ou laisser vos clients réserver un créneau seuls, même à 23 h. Paiement sécurisé, gestion simple, pensé mobile d'abord.",
-        t: ["Paiement sécurisé", "Créneaux", "Click & collect", "Stock"] },
+        t: ["Paiement sécurisé", "Créneaux", "Click & collect", "Stock"],
+        u: "#commande", ul: "Parler de ce projet",
+        pre: "Bonjour, je voudrais une boutique en ligne ou un système de réservation. " },
       { n: "Refonte d'un site existant",
         i: '<path d="M4 12a8 8 0 0 1 13.7-5.7L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 0 1-13.7 5.7L4 16"/><path d="M4 20v-4h4"/>',
         d: "Votre site est lent, daté ou invisible sur Google ? On garde ce qui marche, on refait le reste. Vos contenus et votre référencement acquis sont préservés.",
-        t: ["Contenus repris", "SEO préservé", "Redirections", "Sans coupure"] },
+        t: ["Contenus repris", "SEO préservé", "Redirections", "Sans coupure"],
+        u: "#commande", ul: "Parler de ce projet",
+        pre: "Bonjour, j'ai déjà un site que je voudrais refondre. " },
       { n: "Application mobile",
         i: '<rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M10.5 18.6h3"/>',
         d: "De la maquette à la publication sur les stores, quand un site ne suffit plus et qu'il vous faut une vraie application.",
@@ -350,7 +354,9 @@
       { n: "Référencement Google",
         i: '<circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/><path d="M8 11h6M11 8v6"/>',
         d: "Être trouvé quand quelqu'un cherche votre métier près de chez vous. Search Console, données structurées, contenus écrits pour votre région, et les chiffres qui disent ce que ça rapporte.",
-        t: ["Search Console", "Données structurées", "Contenus locaux", "Relevé mensuel"] },
+        t: ["Search Console", "Données structurées", "Contenus locaux", "Relevé mensuel"],
+        u: "#commande", ul: "Parler de ce projet",
+        pre: "Bonjour, je voudrais être mieux référencé sur Google. " },
       { n: "Hébergement & évolutions",
         i: '<rect x="3" y="4" width="18" height="6" rx="1.8"/><rect x="3" y="14" width="18" height="6" rx="1.8"/><path d="M7 7h.01M7 17h.01"/>',
         d: "Une fois en ligne, un site vit. Je m'occupe de l'hébergement, des sauvegardes, de la sécurité et des changements que vous me demandez.",
@@ -378,7 +384,7 @@
       var f = SERVICES[i];
       var h = '<span class="o-panel-n">0' + (i + 1) + " / 0" + SERVICES.length + "</span><h3>" + f.n + "</h3><p>" + f.d + "</p>" +
               "<ul>" + f.t.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</ul>" +
-              '<p class="o-panel-link">' + (f.u ? '<a href="' + f.u + '">' + f.ul + " →</a>" : "Sur devis, après un échange") + "</p>";
+              '<p class="o-panel-link">' + (f.u ? '<a href="' + f.u + '"' + (f.pre ? ' data-prefill="' + f.pre.replace(/"/g, "&quot;") + '"' : "") + ">" + f.ul + " →</a>" : "Sur devis, après un échange") + "</p>";
       if (net || prefersReduced) { panel.innerHTML = h; return; }
       panel.classList.add("swap");
       setTimeout(function () { panel.innerHTML = h; panel.classList.remove("swap"); }, 220);
@@ -387,6 +393,15 @@
     nodesEl.addEventListener("click", function (e) {
       var n = e.target.closest(".node"); if (!n) return;
       touche = true; clearInterval(boucle); montre(Number(n.getAttribute("data-i")));
+    });
+
+    /* Lien « Parler de ce projet » : pré-remplit le message du contact sans
+       écraser ce que le visiteur aurait déjà tapé, puis y place le curseur. */
+    panel.addEventListener("click", function (e) {
+      var a = e.target.closest("a[data-prefill]"); if (!a) return;
+      var msg = $("#message");
+      if (msg && !msg.value.trim()) msg.value = a.getAttribute("data-prefill");
+      if (msg) setTimeout(function () { msg.focus(); }, 420);
     });
     montre(0, true);
 

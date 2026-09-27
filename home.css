@@ -788,6 +788,30 @@ a.field-row:hover .idx { color: var(--heat-txt); }
   .o-panel-body, .node .ic, .orbit-lines line { transition: none; }
 }
 
+/* ===== Confiance : bande de projets réels ========================
+   Preuve sociale honnête — sept projets livrés, aucun témoignage
+   inventé, aucun logo image. Roster typographique sur l'obsidienne,
+   placé haut (avant les travaux) comme les bandes « logos » des refs. */
+.trust { padding-block: clamp(2.4rem, 4.5vw, 3.6rem);
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.trust-lead { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 1.3rem; }
+.trust-list { list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: .6rem; }
+.trust-item { display: inline-flex; flex-direction: column; gap: .18rem;
+  padding: .7rem 1.05rem; border-radius: 12px;
+  background: var(--glass); border: 1px solid var(--line-2);
+  transition: transform .3s var(--ease), border-color .3s var(--ease); }
+.trust-item:hover { transform: translateY(-2px); border-color: var(--line-heat); }
+.trust-item strong { font-family: var(--f-display); font-weight: 700; font-size: 1.02rem;
+  letter-spacing: -0.02em; color: var(--ink); }
+.trust-item span { font-family: var(--f-mono); font-size: .7rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-soft); }
+@media (prefers-reduced-motion: reduce) {
+  .trust-item { transition: border-color .3s var(--ease); }
+  .trust-item:hover { transform: none; }
+}
+
 /* ===== Les travaux : trois cartes ================================
    Remplace la maquette rotative, qui prenait 1 600 px pour un seul
    projet. Trois preuves visibles d'un coup, aucun script. */

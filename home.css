@@ -913,15 +913,15 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
   .sc-name { font-size: .92rem; }
   .sc-bar { left: .95rem; right: .95rem; bottom: 4px; border-radius: 2px; }
 }
-/* Mobile : le téléphone passe au premier plan (34 % de la largeur), l'écran
-   PC recule à gauche (84 %) et n'est plus recouvert que sur son bord droit.
-   Le padding vertical de .devices réserve la hauteur du téléphone, plus
-   haut que le PC : rien ne déborde et le vide sous la maquette disparaît. */
+/* Mobile : le téléphone (27 % de la largeur) et l'écran PC (88 %, calé
+   à gauche) ont presque la même hauteur ; le PC n'est recouvert que sur
+   son bord droit. Le padding vertical de .devices réserve le peu de
+   hauteur en plus du téléphone : rien ne déborde. */
 @media (max-width: 520px) {
   .showcase-stage { padding: .5rem 0 .75rem; }
-  .devices { padding-block: 10.6%; }
-  .laptop-device { width: 84%; }
-  .phone { width: 34%; min-width: 0; right: 0; bottom: 0; }
+  .devices { padding-block: 1.8%; }
+  .laptop-device { width: 88%; }
+  .phone { width: 27%; min-width: 0; right: 0; bottom: 0; }
   .phone-island { top: 6px; height: 6px; }
   .sc-open { width: 100%; justify-content: center; }
 }

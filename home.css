@@ -810,15 +810,17 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 .trust-track { display: flex; align-items: center; gap: .8rem; width: max-content;
   margin: 0; padding: 0; list-style: none; animation: trust-scroll 34s linear infinite; }
 .trust-marquee:hover .trust-track { animation-play-state: paused; }
+/* Logos en silhouette claire, sans cadre, dimensionnés à surface égale
+   (un emblème carré est plus haut qu'un logo en longueur, pour le même
+   poids visuel). Atténués au repos, pleins au survol de la bande. */
 .tlogo { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
-  height: 74px; padding: 0 1.5rem; border-radius: 14px;
-  background: var(--glass); border: 1px solid var(--line-2); }
-.tlogo img { height: 40px; width: auto; max-width: 150px; object-fit: contain; opacity: .92; }
-.tlogo img[src*="yumea"] { border-radius: 8px; }
+  height: 64px; padding: 0 clamp(1.4rem, 3vw, 2.6rem); }
+.tlogo img { display: block; max-width: none; opacity: .72; transition: opacity .3s var(--ease); }
+.trust-marquee:hover .tlogo img { opacity: .9; }
 @keyframes trust-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @media (max-width: 640px) {
-  .tlogo { height: 60px; padding: 0 1.1rem; }
-  .tlogo img { height: 32px; }
+  .tlogo { height: 54px; padding: 0 1.2rem; }
+  .tlogo img { transform: scale(.85); }
 }
 @media (prefers-reduced-motion: reduce) {
   .trust-track { animation: none; flex-wrap: wrap; width: auto; }
@@ -902,6 +904,9 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 .sc-kind { margin-top: .7rem; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--heat-txt); }
 .showcase-title { margin: 0 0 .5rem; font-size: clamp(2rem, 1.3rem + 2.2vw, 2.9rem); font-weight: 700; }
 .showcase-desc { color: var(--ink-soft); max-width: 42ch; }
+.showcase-desc span { display: block; }
+.sc-who { color: var(--ink); }
+.sc-does { margin-top: .2rem; }
 .sc-tags { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.1rem 0 1.5rem; padding: 0; }
 .sc-tags li { padding: .32rem .7rem; font-size: .82rem; color: var(--ink-warm);
   border: 1px solid var(--line-2); border-radius: 999px; background: rgba(139,124,255,.06); }
@@ -964,9 +969,9 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
    bas de .devices réserve ce débordement. Espacements resserrés. */
 @media (max-width: 520px) {
   .trust { padding-block: 1.8rem 1.4rem; }
-  .works > .spread { padding-block: 2.2rem 2.8rem; }
+  .works > .spread { padding-block: 2.2rem 2.6rem; }
   .works .spread-head { margin-bottom: 1rem; }
-  .showcase { gap: .8rem; }
+  .showcase { gap: 1.1rem; }
   .showcase-stage { padding: .4rem 0 .6rem; }
   .sc-ambient { inset: 6% 6% 10%; }
   .sc-floor { bottom: .1rem; height: 26px; width: 92%; }

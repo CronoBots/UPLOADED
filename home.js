@@ -337,10 +337,10 @@
     var showcase = $("[data-showcase]");
     if (!showcase) return;
     var PROJECTS = [
-      { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Pizzeria au feu de bois à Nandrin, sur place ou à emporter. Sur le site : la carte complète, « Ma liste » pour préparer sa commande et l'appel en un geste pour réserver.", tags: ["Carte en ligne", "Liste de commande", "Appel direct"] },
-      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Chanteur et auteur pop-rock, à l'affiche du Sanremo Rock 2026. Sur le site : son album, ses clips et ses actus, en français et en anglais.", tags: ["FR / EN", "Musique & clips", "Actus"] },
-      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", glow: .08, kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais à Flémalle : soins du cuir chevelu, du visage et shiatsu. Sur le site : les rituels et leurs tarifs, les bons cadeaux et la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
-      { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "Collection d'avatars NFT uniques sur la blockchain Cronos, onze drops épuisés sur Crypto.com. Sur le site : les collections, le classement des détenteurs et un bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
+      { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", who: "Pizzeria au feu de bois à Nandrin, sur place ou à emporter.", does: "La carte complète, « Ma liste » pour préparer sa commande, l'appel en un geste.", tags: ["Carte en ligne", "Liste de commande", "Appel direct"] },
+      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", who: "Chanteur et auteur pop-rock, à l'affiche du Sanremo Rock 2026.", does: "Son album, ses clips et ses actus, en français et en anglais.", tags: ["FR / EN", "Musique & clips", "Actus"] },
+      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", glow: .08, kind: "Site web · Bien-être & Head Spa", who: "Institut de Head Spa japonais à Flémalle.", does: "Rituels et tarifs, bons cadeaux, prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
+      { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", who: "Collection d'avatars NFT uniques sur la blockchain Cronos.", does: "Les collections, le classement des détenteurs, un bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
     ];
     var warmed = {};
     function warm(i) {
@@ -357,7 +357,7 @@
     var elDesc = q("[data-sc-desc]"), elLink = q("[data-sc-link]"), elTags = q("[data-sc-tags]");
     var tabsWrap = q("[data-sc-tabs]");
     var devicesEl = q("[data-devices]");
-    var INT = prefersReduced ? 0 : 5500;
+    var INT = prefersReduced ? 0 : 8000;
     showcase.style.setProperty("--sc-int", INT + "ms");
     var index = 0, timer = null, started = false;
 
@@ -377,7 +377,7 @@
       b.innerHTML = '<span class="sc-n">' + (i < 9 ? "0" : "") + (i + 1) + '</span><span class="sc-name"></span>'
         + '<span class="sc-bar" aria-hidden="true"><span class="sc-dot-fill"></span></span>';
       b.querySelector(".sc-name").textContent = p.name;
-      b.addEventListener("click", function () { if (!started) { started = true; showcase.classList.add("is-live"); } go(i, true); arm(); });
+      b.addEventListener("click", function () { takeOver(); go(i, true); });
       tabsWrap.appendChild(b);
       return b;
     });
@@ -388,7 +388,7 @@
       if (!dotsWrap) return null;
       var d = document.createElement("button");
       d.type = "button"; d.setAttribute("aria-label", p.name);
-      d.addEventListener("click", function () { if (!started) { started = true; showcase.classList.add("is-live"); } go(i, true); arm(); });
+      d.addEventListener("click", function () { takeOver(); go(i, true); });
       dotsWrap.appendChild(d);
       return d;
     }).filter(Boolean);
@@ -410,7 +410,10 @@
       if (elLink) elLink.href = p.url;
       if (elKind) elKind.textContent = p.kind;
       if (elTitle) elTitle.textContent = p.name;
-      if (elDesc) elDesc.textContent = p.desc;
+      if (elDesc) {
+        elDesc.textContent = "";
+        [["sc-who", p.who], ["sc-does", p.does]].forEach(function (x) { var sp = document.createElement("span"); sp.className = x[0]; sp.textContent = x[1]; elDesc.appendChild(sp); elDesc.appendChild(document.createTextNode(" ")); });
+      }
       if (elTags) {
         elTags.textContent = "";
         (p.tags || []).forEach(function (t) { var li = document.createElement("li"); li.textContent = t; elTags.appendChild(li); });
@@ -503,17 +506,47 @@
         var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
         if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
         swipedAt = Date.now();
-        if (!started) { started = true; showcase.classList.add("is-live"); }
+        takeOver();
         var step = dx < 0 ? 1 : -1;
         go(index + step, true, step);
-        arm();
       }, { passive: true });
     }
-    function arm() { if (!INT) return; clearInterval(timer); timer = setInterval(function () { go(index + 1, true); }, INT); }
+    /* Dès que le visiteur choisit un projet (onglet, point, balayage), la
+       rotation automatique s'arrête pour de bon : il a pris la main. */
+    var userTook = false;
+    function takeOver() { userTook = true; started = true; stop(); showcase.classList.remove("is-live"); }
+    function arm() { if (!INT || userTook) return; clearInterval(timer); timer = setInterval(function () { go(index + 1, true); }, INT); }
     function stop() { clearInterval(timer); }
 
     paint(0);
     warmed[0] = true;
+
+    /* Hauteur de la fiche réservée pour le projet le plus long : la page ne
+       saute plus quand le projet change. Mesurée sur une copie invisible,
+       recalculée au redimensionnement. */
+    var copyEl = q(".showcase-copy");
+    function reserveCopy() {
+      if (!copyEl) return;
+      var probe = copyEl.cloneNode(true);
+      probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;min-height:0;width:" + copyEl.offsetWidth + "px";
+      probe.removeAttribute("id");
+      copyEl.parentNode.appendChild(probe);
+      var set = function (sel, v) { var e = probe.querySelector(sel); if (e) e.textContent = v; };
+      var max = 0;
+      PROJECTS.forEach(function (p) {
+        set("[data-sc-title]", p.name); set("[data-sc-kind]", p.kind);
+        var d = probe.querySelector("[data-sc-desc]");
+        if (d) d.innerHTML = '<span class="sc-who"></span> <span class="sc-does"></span>', d.firstChild.textContent = p.who, d.lastChild.textContent = p.does;
+        var ul = probe.querySelector("[data-sc-tags]");
+        if (ul) { ul.textContent = ""; (p.tags || []).forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); }); }
+        max = Math.max(max, probe.offsetHeight);
+      });
+      probe.remove();
+      copyEl.style.minHeight = max + "px";
+    }
+    reserveCopy();
+    var rz; window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(reserveCopy, 150); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(reserveCopy);
     if ("requestIdleCallback" in window) requestIdleCallback(function () { warm(1); }, { timeout: 3000 });
     else window.addEventListener("load", function () { setTimeout(function () { warm(1); }, 600); });
 

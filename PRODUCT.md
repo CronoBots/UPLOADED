@@ -32,7 +32,7 @@ Prospection entrante via le site (Google, bouche-à-oreille). Le visiteur lit su
 
 ## Brand Commitments
 
-- Nom : **Uploaded** (logotype « Upload » en encre + « ed » en violet, signe : la flèche de téléversement). Fondateur signant : Vincent Buron.
+- Nom : **Uploaded** (logo « uploaded.be » : lettres blanches, le « l » en bouton d'alimentation et le point du « .be » en bleu #4884D8, couleur d'accent de tout le site). Fondateur signant : Vincent Buron.
 - Signature de pied de page à conserver (« Conçu & développé … »).
 - Voix : directe, honnête, sans jargon, chaleureuse mais experte ; parle à la première personne (« je »). Vouvoiement du client.
 - Coordonnées réelles : Rue Chapéchêne 10, 4120 Neupré, Belgique · 0460 96 21 46.

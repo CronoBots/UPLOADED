@@ -2,45 +2,32 @@
 
 ## Direction
 
-**Studio obsidienne — réseau vivant**, le monde du client. La structure en trois écrans du brief d'origine s'est élargie pour répondre aux trois questions que le visiteur se posait sans trouver de réponse — ce que je vends, comment ça se passe, combien ça coûte — sans changer ni le monde ni le rythme. Une scène obsidienne filmée dans le noir : une constellation de nœuds reliés en 3D (Canvas temps réel) qui respire et réagit au visiteur, l'accent indigo/violet, les vitrines de verre, le carrousel des réalisations, la signature en particules — la flèche du logo. Aucune requête tierce. Tout respecte `prefers-reduced-motion`.
+**Studio obsidienne — réseau vivant**, le monde du client. La structure en trois écrans du brief d'origine s'est élargie pour répondre aux trois questions que le visiteur se posait sans trouver de réponse — ce que je vends, comment ça se passe, combien ça coûte — sans changer ni le monde ni le rythme. Une scène obsidienne filmée dans le noir : une constellation de nœuds reliés en 3D (Canvas temps réel) qui respire et réagit au visiteur, l'accent bleu du logo, les vitrines de verre, le carrousel des réalisations, la signature en particules — la flèche du logo. Aucune requête tierce. Tout respecte `prefers-reduced-motion`.
 
 ## Logo
 
-Signe : la **flèche de téléversement** — hampe, chevron, barre au sol — en
-dégradé violet (`--heat-core` → `--heat-2`). Elle dit le mot, sans détour, et
-reste lisible à 16 px. Wordmark : `Upload` en encre, `ed` en dégradé violet,
-Bricolage Grotesque 700 vectorisée. La coupure n'est pas décorative : le
-participe passé *est* la marque — l'état, une fois que c'est en ligne.
+**uploaded.be**, fourni par le client (source : `img/logo-uploaded-source.png`).
+Lettres rondes et épaisses en blanc ; le « l » et le « o » forment un bouton
+d'alimentation, dont la barre est bleue, comme le point du « .be ». Signature
+en capitales : « Création de sites web · Applications mobiles · Référencement ».
+Le nom est aussi l'adresse. Déclinaisons :
+`img/logo-uploaded.webp` (mot seul, menus et pied de page),
+`img/logo-uploaded-full.webp` (avec signature), `og-image.png` (partage),
+`favicon.svg` et `apple-touch-icon.png` (le bouton seul, sur bleu nuit).
 
-Le dégradé de la flèche est en `userSpaceOnUse` et non en `objectBoundingBox` :
-un trait strictement vertical ou horizontal a une boîte englobante dégénérée, et
-la spécification SVG interdit alors le rendu. La hampe et la barre
-disparaîtraient.
-
-| Fichier | Usage |
-|---|---|
-| `logo.svg` | Lockup horizontal, fond transparent — texte vectorisé |
-| `logo-on-dark.svg` · `logo-on-light.svg` | Le lockup sur aplat obsidienne et sur blanc |
-| `logo-mark.svg` | La flèche seule (avatar, tampon, réseaux) |
-| `logo-mono.svg` | Une seule couleur via `currentColor` — impression, facture |
-| `favicon.svg` | La flèche dans la pastille obsidienne |
-| `og-image.svg` · `og-image.png` | Image de partage 1200×630, texte vectorisé |
-
-Dans les pages, le wordmark s'écrit `Upload` + `ed`, la terminaison portant la
-classe `.w-mark` sur l'accueil et `.lw` sur les pages secondaires.
-
-## Palette
+La couleur d'accent du site est le bleu du logo, `#4884D8`, et toute la gamme
+en dérive.
 
 | Rôle | Token | Valeur |
 |---|---|---|
-| Obsidienne indigo (fond) | `--bg` | `#0B0B16` |
+| Bleu nuit (fond) | `--bg` | `#0A0D16` |
 | Panneau, verre | `--panel` `--glass` | `#12161F` · `rgba(18,22,31,.62)` |
 | Encre claire chaude | `--ink` | `#F2EEE6` |
 | Secondaire | `--ink-soft` | `#9AA2B4` |
-| Violet clair — grand affichage, fills | `--heat` | `#8B7CFF` |
-| Indigo — liens | `--heat-2` | `#6366F1` |
-| Cœur clair | `--heat-core` | `#C4B5FD` |
-| Petit texte violet (AA) | `--heat-txt` | `#A99CFF` |
+| Bleu du logo — grand affichage, fills | `--heat` | `#4884D8` |
+| Bleu profond — liens, connexions | `--heat-2` | `#3B6FC4` |
+| Cœur clair | `--heat-core` | `#A9C8F5` |
+| Petit texte bleu (8,2:1) | `--heat-txt` | `#7FAAEE` |
 
 ## Typographie
 
@@ -66,10 +53,10 @@ Motion : réseau vivant (parallaxe souris, nœud illuminé sous le curseur, paus
 
 ## Pages de service, pages locales, blog et légales
 
-`styles.css` + `page-theme.css` (surcharge obsidienne, chargée après) : mêmes tokens, même typo, hero à champ de points, cartes verre, accent violet.
+`styles.css` + `page-theme.css` (surcharge obsidienne, chargée après) : mêmes tokens, même typo, hero à champ de points, cartes verre, accent bleu.
 
 - **Pages de service et locales** : application mobile, puis Liège, Seraing, Huy et Namur. Même gabarit (hero, `highlights-grid`, cartes métiers, bloc budget, méthode en 4 étapes, FAQ, liens croisés), mais un texte réellement distinct par ville — jamais la même page avec le nom changé.
-- **Blog** (`blog.html` + `blog/*.html`) : liste en cartes `.post-card`, article en colonne de lecture de 720 px (`.post`), encadrés `.post-aside` à filet violet, tableaux `.post-table` à en-têtes mono, bloc de fin `.post-cta`. Styles ajoutés en fin de `page-theme.css`.
+- **Blog** (`blog.html` + `blog/*.html`) : liste en cartes `.post-card`, article en colonne de lecture de 720 px (`.post`), encadrés `.post-aside` à filet bleu, tableaux `.post-table` à en-têtes mono, bloc de fin `.post-cta`. Styles ajoutés en fin de `page-theme.css`.
 - Les liens en plein texte sont soulignés : sans cela, ils ne se distinguaient que par la couleur (WCAG 1.4.1).
 
 ## Ce qui n'existe plus

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Uploaded">
-  <defs><linearGradient id="gu" gradientUnits="userSpaceOnUse" x1="25.01" y1="23.49" x2="74.99" y2="78.57"><stop offset="0" stop-color="#C4B5FD"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>
-  <rect width="100" height="100" rx="24" fill="#0B0B16"/>
-  <rect x="9" y="9" width="82" height="82" rx="19" fill="none" stroke="#1E2336" stroke-width="2"/>
-  <g fill="none" stroke="url(#gu)" stroke-width="11.73" stroke-linecap="round" stroke-linejoin="round"><path d="M 50.00 67.35 V 25.02"/><path d="M 31.13 42.87 L 50.00 23.49 L 68.87 42.87"/><path d="M 25.01 78.57 H 74.99"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="uploaded.be">
+  <!-- Le « l » en bouton d'alimentation du logo uploaded.be : anneau blanc ouvert en haut, barre bleue -->
+  <rect width="100" height="100" rx="24" fill="#0F1524"/>
+  <path d="M 36.1 33.6 A 21 21 0 1 0 63.9 33.6" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+  <rect x="44.5" y="16" width="11" height="34" rx="5.5" fill="#4884D8"/>
 </svg>

@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Uploaded">
-  <defs><linearGradient id="gu" gradientUnits="userSpaceOnUse" x1="25.01" y1="23.49" x2="74.99" y2="78.57"><stop offset="0" stop-color="#C4B5FD"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>
+  <defs><linearGradient id="gu" gradientUnits="userSpaceOnUse" x1="25.01" y1="23.49" x2="74.99" y2="78.57"><stop offset="0" stop-color="#A9C8F5"/><stop offset="1" stop-color="#3B6FC4"/></linearGradient></defs>
   <g fill="none" stroke="url(#gu)" stroke-width="11.73" stroke-linecap="round" stroke-linejoin="round"><path d="M 50.00 67.35 V 25.02"/><path d="M 31.13 42.87 L 50.00 23.49 L 68.87 42.87"/><path d="M 25.01 78.57 H 74.99"/></g>
 </svg>

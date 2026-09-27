@@ -27,17 +27,25 @@
     revealEls.forEach(function (el) { ro.observe(el); });
   }
 
-  /* ---- Masthead : fixe après le hero ---- */
+  /* ---- Masthead : barre givrée dès 40 px de défilement (comme jaydenmusic.com) ---- */
   var masthead = $("#masthead");
   var cover = $(".cover");
-  if (masthead && cover && "IntersectionObserver" in window) {
-    var mio = new IntersectionObserver(function (entries) {
+  if (masthead) {
+    var onScroll = function () { masthead.classList.toggle("is-scrolled", window.scrollY > 40); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* ---- Lien actif selon la section visible ---- */
+  if ("IntersectionObserver" in window) {
+    var navLinks = $$(".nav-links a[href^='#'], .nav-drawer a[href^='#']");
+    var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        // quand le hero sort du haut, on épingle une barre pleine
-        masthead.classList.toggle("is-fixed", !e.isIntersecting);
+        if (!e.isIntersecting) return;
+        navLinks.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id); });
       });
-    }, { rootMargin: "-79px 0px 0px 0px", threshold: 0 });
-    mio.observe(cover);
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    $$("main section[id]").forEach(function (sec) { spy.observe(sec); });
   }
 
   /* ---- Menu mobile ---- */
@@ -48,7 +56,7 @@
       var open = document.body.classList.toggle("nav-open");
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
-    $$("[data-nav-close], .nav-drawer a").forEach(function (el) { el.addEventListener("click", closeNav); });
+    $$(".nav-drawer a").forEach(function (el) { el.addEventListener("click", closeNav); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeNav(); });
   }
 

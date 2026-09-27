@@ -316,6 +316,128 @@
     else loop();
   })();
 
+  /* ------------------------------------------------------------ Showcase « aperçu PC + mobile »
+     Maquette navigateur + téléphone qui défile entre les projets, parallaxe 3D à la souris.
+     Rotation auto 3,8 s (pause au survol / hors viewport / onglet caché), figée sous
+     prefers-reduced-motion. Cliquer l'aperçu ouvre le site. */
+  (function () {
+    var showcase = $("[data-showcase]");
+    if (!showcase) return;
+    var PROJECTS = [
+      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=5", mobile: "img/jaydenmusic-mobile.webp?v=5", name: "Jayden", kind: "Site web · Artiste musical", desc: "Site officiel du chanteur Jayden — rock, soul et poésie." },
+      { host: "cronobots.github.io/PIZZAPINO", url: "https://cronobots.github.io/PIZZAPINO/", desktop: "img/pizzapino-desktop.webp?v=5", mobile: "img/pizzapino-mobile.webp?v=5", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Restaurant italien & pizzas au feu de bois à Nandrin." },
+      { host: "yumea-wellness.be", url: "https://www.yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=5", mobile: "img/yumea-mobile.webp?v=5", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais et de soins du visage." }
+    ];
+    var warmed = {};
+    function warm(i) {
+      var k = (i + PROJECTS.length) % PROJECTS.length, p = PROJECTS[k];
+      if (!p || warmed[k]) return;
+      warmed[k] = true;
+      new Image().src = p.desktop;
+      new Image().src = p.mobile;
+    }
+
+    var q = function (s) { return showcase.querySelector(s); };
+    var elDesktop = q("[data-sc-desktop]"), elMobile = q("[data-sc-mobile]");
+    var elUrl = q("[data-sc-url]"), elKind = q("[data-sc-kind]"), elTitle = q("[data-sc-title]");
+    var elDesc = q("[data-sc-desc]"), elLink = q("[data-sc-link]");
+    var tabsWrap = q("[data-sc-tabs]");
+    var devicesEl = q("[data-devices]");
+    var INT = prefersReduced ? 0 : 3800;
+    showcase.style.setProperty("--sc-int", INT + "ms");
+    var index = 0, timer = null, started = false;
+
+    if (devicesEl) {
+      devicesEl.classList.add("is-clickable");
+      devicesEl.setAttribute("role", "link");
+      devicesEl.setAttribute("tabindex", "0");
+      var openProject = function () { var u = PROJECTS[index] && PROJECTS[index].url; if (u) window.open(u, "_blank", "noopener"); };
+      devicesEl.addEventListener("click", openProject);
+      devicesEl.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProject(); } });
+    }
+
+    var tabs = PROJECTS.map(function (p, i) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "sc-dot"; b.setAttribute("role", "tab"); b.setAttribute("aria-label", p.name);
+      b.innerHTML = '<span class="sc-dot-fill" aria-hidden="true"></span>';
+      b.addEventListener("click", function () { if (!started) { started = true; showcase.classList.add("is-live"); } go(i, true); arm(); });
+      tabsWrap.appendChild(b);
+      return b;
+    });
+
+    function restartFill(i) {
+      if (prefersReduced) return;
+      var fill = tabs[i] && tabs[i].querySelector(".sc-dot-fill");
+      if (!fill) return;
+      fill.style.animation = "none"; void fill.offsetWidth; fill.style.animation = "";
+    }
+    function paint(i) {
+      var p = PROJECTS[i];
+      if (elDesktop) { elDesktop.src = p.desktop; elDesktop.alt = p.name + " — aperçu du site (version ordinateur)"; }
+      if (elMobile) elMobile.src = p.mobile;
+      if (elUrl) elUrl.textContent = p.host;
+      if (elLink) elLink.href = p.url;
+      if (elKind) elKind.textContent = p.kind;
+      if (elTitle) elTitle.textContent = p.name;
+      if (elDesc) elDesc.textContent = p.desc;
+      if (devicesEl) devicesEl.setAttribute("aria-label", "Ouvrir le site " + p.name + " (" + p.host + ")");
+      tabs.forEach(function (t, k) { t.classList.toggle("active", k === i); t.setAttribute("aria-selected", k === i ? "true" : "false"); });
+      restartFill(i);
+    }
+    function go(i, animate) {
+      index = (i + PROJECTS.length) % PROJECTS.length;
+      warm(index + 1);
+      if (animate && !prefersReduced) {
+        showcase.classList.add("is-swapping");
+        setTimeout(function () { paint(index); showcase.classList.remove("is-swapping"); }, 220);
+      } else { paint(index); }
+    }
+    function arm() { if (!INT) return; clearInterval(timer); timer = setInterval(function () { go(index + 1, true); }, INT); }
+    function stop() { clearInterval(timer); }
+
+    paint(0);
+    warmed[0] = true;
+    if ("requestIdleCallback" in window) requestIdleCallback(function () { warm(1); }, { timeout: 3000 });
+    else window.addEventListener("load", function () { setTimeout(function () { warm(1); }, 600); });
+
+    if ("IntersectionObserver" in window && !prefersReduced) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && !started) { started = true; showcase.classList.add("is-live"); restartFill(index); arm(); }
+        });
+      }, { threshold: 0.35 });
+      io.observe(showcase);
+    }
+
+    showcase.addEventListener("pointerenter", function () { stop(); showcase.classList.add("is-paused"); });
+    showcase.addEventListener("pointerleave", function () { showcase.classList.remove("is-paused"); if (started) { restartFill(index); arm(); } });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) stop(); else if (started && !showcase.matches(":hover")) { restartFill(index); arm(); }
+    });
+
+    /* Parallaxe 3D (PC + mobile se décalent différemment) */
+    if (finePointer && !prefersReduced) {
+      var stage = showcase.querySelector(".showcase-stage");
+      var laptop = showcase.querySelector(".laptop-device");
+      var phone = showcase.querySelector(".phone");
+      if (stage && devicesEl && laptop && phone) {
+        var clamp = function (v) { return v < -0.5 ? -0.5 : v > 0.5 ? 0.5 : v; };
+        var lastE = null, ticking = false;
+        var update = function () {
+          ticking = false; if (!lastE) return;
+          var sr = stage.getBoundingClientRect();
+          var rx = clamp((lastE.clientX - sr.left) / sr.width - 0.5);
+          var ry = clamp((lastE.clientY - sr.top) / sr.height - 0.5);
+          devicesEl.style.transform = "rotateY(" + (rx * 8).toFixed(2) + "deg) rotateX(" + (-ry * 5).toFixed(2) + "deg)";
+          laptop.style.transform = "translateZ(-8px) rotateY(" + (rx * 4).toFixed(2) + "deg) rotateX(" + (-ry * 3).toFixed(2) + "deg)";
+          phone.style.transform = "translateZ(22px) rotateY(" + (rx * 11).toFixed(2) + "deg) rotateX(" + (-ry * 7).toFixed(2) + "deg)";
+        };
+        window.addEventListener("pointermove", function (e) { lastE = e; if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+        document.addEventListener("mouseleave", function () { devicesEl.style.transform = ""; laptop.style.transform = ""; phone.style.transform = ""; });
+      }
+    }
+  })();
+
   /* ------------------------------------------------------------ L'orbite des prestations
      Six noeuds sur un anneau, panneau de detail a droite. Clavier : chaque noeud est un
      <button>. La rotation automatique s'arrete au premier clic et ne demarre jamais sous

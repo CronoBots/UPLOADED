@@ -849,11 +849,11 @@ a.field-row:hover .idx { color: var(--heat-txt); }
 .browser-screen { position: relative; aspect-ratio: 16/10; background: #05070a; }
 .browser-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: opacity .28s var(--ease); }
 .phone { position: absolute; right: -5%; bottom: -13%; width: 27%; min-width: 108px;
-  aspect-ratio: 9 / 19.5; border-radius: 20px;
+  aspect-ratio: 9 / 19.5; border-radius: 9% / 4.15%; /* arrondi proportionnel (≈ 9 % de la largeur) : ne rogne pas les coins de la capture, même à 106 px */
   background: #0c0f15; border: 1px solid var(--line-2); /* même liseré que l'écran PC */
   box-shadow: 0 32px 60px -18px rgba(0,0,0,.82), 0 0 52px -16px rgba(139,124,255,.55);
   z-index: 3; transform-style: preserve-3d; transition: transform .3s var(--ease); }
-.phone-screen { position: relative; width: 100%; height: 100%; border-radius: 19px; overflow: hidden; background: #05070a; }
+.phone-screen { position: relative; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; background: #05070a; }
 .phone-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: opacity .28s var(--ease); }
 .phone-island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 30%; height: 8px; background: #05070a; border-radius: 20px; z-index: 2; }
 .is-swapping .browser-screen img, .is-swapping .phone-screen img { opacity: 0; }

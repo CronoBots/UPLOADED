@@ -904,7 +904,12 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 .sc-tags { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.1rem 0 1.5rem; padding: 0; }
 .sc-tags li { padding: .32rem .7rem; font-size: .82rem; color: var(--ink-warm);
   border: 1px solid var(--line-2); border-radius: 999px; background: rgba(139,124,255,.06); }
-.sc-open { padding: .75rem 1.2rem; }
+/* Bouton secondaire : le violet plein reste réservé au contact, et un clic
+   sur la maquette ouvre déjà le site. */
+.sc-open { padding: .75rem 1.2rem; color: var(--heat-core); background: rgba(139,124,255,.06); border-color: var(--line-heat); }
+.sc-open:hover { color: var(--ink); background: rgba(139,124,255,.14); border-color: var(--heat); }
+/* Points sous la maquette (≤ 900 px) : combien de projets, lequel est affiché */
+.sc-dots { display: none; }
 
 /* Liste nommée des projets : 01 Jayden, 02 Pizzeria Pino…
    La barre sous le projet affiché montre le temps avant le suivant. */
@@ -931,6 +936,10 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 @media (max-width: 900px) {
   .showcase { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
   .showcase-stage { order: -1; padding-bottom: clamp(3.4rem, 9vw, 5rem); }
+  .sc-dots { display: flex; justify-content: center; gap: 8px; margin-top: 1rem; }
+  .sc-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(242,238,230,.2); cursor: pointer;
+    transition: background .3s var(--ease), width .3s var(--ease); }
+  .sc-dots span.on { width: 20px; border-radius: 4px; background: var(--heat); }
   .phone { right: -5%; }
   .sc-list { position: relative; flex-direction: row; gap: .5rem; border-top: 0; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding-inline: var(--pad); }
   .sc-list::-webkit-scrollbar { display: none; }
@@ -960,7 +969,7 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
   .showcase-stage { touch-action: pan-y; }
   .sc-kind { font-size: .7rem; }
   .showcase-title { margin: .35rem 0 .35rem; font-size: 1.65rem; }
-  .showcase-desc { font-size: .95rem; line-height: 1.5; }
+  .showcase-desc { font-size: .88rem; line-height: 1.5; max-width: none; }
   .sc-tags { gap: .35rem; margin: .85rem 0 1.1rem; }
   .sc-tags li { padding: .26rem .6rem; font-size: .76rem; }
 }

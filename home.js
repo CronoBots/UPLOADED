@@ -324,9 +324,9 @@
     var showcase = $("[data-showcase]");
     if (!showcase) return;
     var PROJECTS = [
-      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Site officiel du chanteur Jayden — rock, soul et poésie." },
-      { host: "cronobots.github.io/PIZZAPINO", url: "https://cronobots.github.io/PIZZAPINO/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Restaurant italien & pizzas au feu de bois à Nandrin." },
-      { host: "yumea-wellness.be", url: "https://www.yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais et de soins du visage." }
+      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Site officiel du chanteur Jayden — rock, soul et poésie.", tags: ["Bilingue FR / EN", "Musique & vidéos", "Actualités"] },
+      { host: "cronobots.github.io/PIZZAPINO", url: "https://cronobots.github.io/PIZZAPINO/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Restaurant italien & pizzas au feu de bois à Nandrin.", tags: ["Carte en ligne", "Réservation", "Appel en un geste"] },
+      { host: "yumea-wellness.be", url: "https://www.yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais et de soins du visage.", tags: ["Rituels & tarifs", "Bons cadeaux", "Prise de rendez-vous"] }
     ];
     var warmed = {};
     function warm(i) {
@@ -340,7 +340,7 @@
     var q = function (s) { return showcase.querySelector(s); };
     var elDesktop = q("[data-sc-desktop]"), elMobile = q("[data-sc-mobile]");
     var elUrl = q("[data-sc-url]"), elKind = q("[data-sc-kind]"), elTitle = q("[data-sc-title]");
-    var elDesc = q("[data-sc-desc]"), elLink = q("[data-sc-link]");
+    var elDesc = q("[data-sc-desc]"), elLink = q("[data-sc-link]"), elTags = q("[data-sc-tags]");
     var tabsWrap = q("[data-sc-tabs]");
     var devicesEl = q("[data-devices]");
     var INT = prefersReduced ? 0 : 3800;
@@ -358,8 +358,10 @@
 
     var tabs = PROJECTS.map(function (p, i) {
       var b = document.createElement("button");
-      b.type = "button"; b.className = "sc-dot"; b.setAttribute("role", "tab"); b.setAttribute("aria-label", p.name);
-      b.innerHTML = '<span class="sc-dot-fill" aria-hidden="true"></span>';
+      b.type = "button"; b.className = "sc-tab"; b.setAttribute("role", "tab");
+      b.innerHTML = '<span class="sc-n">' + (i < 9 ? "0" : "") + (i + 1) + '</span><span class="sc-name"></span>'
+        + '<span class="sc-bar" aria-hidden="true"><span class="sc-dot-fill"></span></span>';
+      b.querySelector(".sc-name").textContent = p.name;
       b.addEventListener("click", function () { if (!started) { started = true; showcase.classList.add("is-live"); } go(i, true); arm(); });
       tabsWrap.appendChild(b);
       return b;
@@ -380,8 +382,14 @@
       if (elKind) elKind.textContent = p.kind;
       if (elTitle) elTitle.textContent = p.name;
       if (elDesc) elDesc.textContent = p.desc;
+      if (elTags) {
+        elTags.textContent = "";
+        (p.tags || []).forEach(function (t) { var li = document.createElement("li"); li.textContent = t; elTags.appendChild(li); });
+      }
       if (devicesEl) devicesEl.setAttribute("aria-label", "Ouvrir le site " + p.name + " (" + p.host + ")");
       tabs.forEach(function (t, k) { t.classList.toggle("active", k === i); t.setAttribute("aria-selected", k === i ? "true" : "false"); });
+      var at = tabs[i];
+      if (at && at.parentNode.scrollWidth > at.parentNode.clientWidth) at.parentNode.scrollTo({ left: at.offsetLeft - 16, behavior: prefersReduced ? "auto" : "smooth" });
       restartFill(i);
     }
     function go(i, animate) {

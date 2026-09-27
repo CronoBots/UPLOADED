@@ -1034,11 +1034,12 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
   .layout-test .showcase-stage { padding-bottom: clamp(3.4rem, 9vw, 5rem); }
 }
 @media (max-width: 520px) {
-  /* Mobile : même composition ; téléphone gardé à 23 % pour rester
-     lisible. Le padding bas de .devices réserve son débordement. */
+  /* Mobile : même composition que sur PC — téléphone à 75 % de la hauteur
+     du PC, posé sur son coin bas-droit, débordant de 20 % vers le bas.
+     Le padding bas de .devices réserve ce débordement. */
   .layout-test .showcase-stage { padding-bottom: 1.4rem; }
-  .layout-test .devices { padding-block: 0 8.4%; }
-  .layout-test .laptop-device { width: 94%; }
-  .layout-test .phone { width: 23%; right: -2%; bottom: 0; }
+  .layout-test .devices { padding-block: 0 11.5%; }
+  .layout-test .laptop-device { width: 90%; }
+  .layout-test .phone { width: 19.5%; right: -1%; bottom: 0; }
 }
 

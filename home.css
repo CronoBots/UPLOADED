@@ -884,10 +884,10 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
      comme si le téléphone flottait à quelques centimètres devant elle. */
   box-shadow: -16px 20px 30px -12px rgba(0,0,0,.6), 0 26px 34px -22px rgba(0,0,0,.85);
   z-index: 3; transform-style: preserve-3d; transition: transform .3s var(--ease); }
-/* Lueur violette du téléphone, coupée net à son bord gauche : elle éclaire
-   le haut, la droite et le bas, jamais l'écran PC qu'il recouvre. */
+/* Lueur violette du téléphone, tout autour et discrète : courte et
+   légère, elle ne fait qu'effleurer l'écran PC côté gauche. */
 .phone::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
-  box-shadow: 0 0 52px -16px rgba(139,124,255,.55); clip-path: inset(-80px -80px -80px 0); }
+  box-shadow: 0 0 30px -10px rgba(139,124,255,.34); }
 .phone-screen { position: relative; width: 100%; height: 100%; border-radius: inherit; overflow: hidden; background: #05070a; }
 .phone-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: opacity .28s var(--ease); }
 .phone-island { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 30%; height: 8px; background: #05070a; border-radius: 20px; z-index: 2; }

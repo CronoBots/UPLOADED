@@ -324,9 +324,9 @@
     var showcase = $("[data-showcase]");
     if (!showcase) return;
     var PROJECTS = [
-      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=5", mobile: "img/jaydenmusic-mobile.webp?v=5", name: "Jayden", kind: "Site web · Artiste musical", desc: "Site officiel du chanteur Jayden — rock, soul et poésie." },
-      { host: "cronobots.github.io/PIZZAPINO", url: "https://cronobots.github.io/PIZZAPINO/", desktop: "img/pizzapino-desktop.webp?v=5", mobile: "img/pizzapino-mobile.webp?v=5", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Restaurant italien & pizzas au feu de bois à Nandrin." },
-      { host: "yumea-wellness.be", url: "https://www.yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=5", mobile: "img/yumea-mobile.webp?v=5", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais et de soins du visage." }
+      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=6", mobile: "img/jaydenmusic-mobile.webp?v=6", name: "Jayden", kind: "Site web · Artiste musical", desc: "Site officiel du chanteur Jayden — rock, soul et poésie." },
+      { host: "cronobots.github.io/PIZZAPINO", url: "https://cronobots.github.io/PIZZAPINO/", desktop: "img/pizzapino-desktop.webp?v=6", mobile: "img/pizzapino-mobile.webp?v=6", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Restaurant italien & pizzas au feu de bois à Nandrin." },
+      { host: "yumea-wellness.be", url: "https://www.yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=6", mobile: "img/yumea-mobile.webp?v=6", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais et de soins du visage." }
     ];
     var warmed = {};
     function warm(i) {
@@ -415,27 +415,6 @@
       if (document.hidden) stop(); else if (started && !showcase.matches(":hover")) { restartFill(index); arm(); }
     });
 
-    /* Parallaxe 3D (PC + mobile se décalent différemment) */
-    if (finePointer && !prefersReduced) {
-      var stage = showcase.querySelector(".showcase-stage");
-      var laptop = showcase.querySelector(".laptop-device");
-      var phone = showcase.querySelector(".phone");
-      if (stage && devicesEl && laptop && phone) {
-        var clamp = function (v) { return v < -0.5 ? -0.5 : v > 0.5 ? 0.5 : v; };
-        var lastE = null, ticking = false;
-        var update = function () {
-          ticking = false; if (!lastE) return;
-          var sr = stage.getBoundingClientRect();
-          var rx = clamp((lastE.clientX - sr.left) / sr.width - 0.5);
-          var ry = clamp((lastE.clientY - sr.top) / sr.height - 0.5);
-          devicesEl.style.transform = "rotateY(" + (rx * 8).toFixed(2) + "deg) rotateX(" + (-ry * 5).toFixed(2) + "deg)";
-          laptop.style.transform = "translateZ(-8px) rotateY(" + (rx * 4).toFixed(2) + "deg) rotateX(" + (-ry * 3).toFixed(2) + "deg)";
-          phone.style.transform = "translateZ(22px) rotateY(" + (rx * 11).toFixed(2) + "deg) rotateX(" + (-ry * 7).toFixed(2) + "deg)";
-        };
-        window.addEventListener("pointermove", function (e) { lastE = e; if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-        document.addEventListener("mouseleave", function () { devicesEl.style.transform = ""; laptop.style.transform = ""; phone.style.transform = ""; });
-      }
-    }
   })();
 
   /* ------------------------------------------------------------ L'orbite des prestations

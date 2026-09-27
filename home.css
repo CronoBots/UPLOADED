@@ -830,7 +830,7 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 /* Deux colonnes : la fiche du projet à gauche (nature, nom, description,
    étiquettes, bouton, liste nommée des projets), la maquette à droite. */
 .works .spread-head { margin-bottom: clamp(1.2rem, 2.4vw, 2rem); }
-.showcase { --sc-int: 3800ms;
+.showcase { --sc-int: 5500ms;
   display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
   gap: clamp(2rem, 4.5vw, 4.5rem); align-items: center; }
 .showcase-stage {
@@ -844,6 +844,13 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
   filter: blur(26px); pointer-events: none; }
 .devices { position: relative; width: 100%; max-width: 760px; margin-inline: auto;
   cursor: pointer; } /* pas de preserve-3d : le z-index garde le téléphone devant le PC */
+/* Cube de rotation entre deux projets (voir home.js) : les deux faces
+   restent visibles pendant le quart de tour, puis la face avant revient
+   sans transformation. */
+.sc-cube { position: relative; transform-style: preserve-3d; }
+.sc-cube.is-turning { transition: transform .9s cubic-bezier(.65, 0, .35, 1); }
+.sc-cube > .devices { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.sc-face-next { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
 .devices.is-clickable:focus-visible { outline: 2px solid var(--heat); outline-offset: 10px; border-radius: 12px; }
 .laptop-device { position: relative; transform-style: preserve-3d; transition: transform .3s var(--ease); }
 .browser { border-radius: 12px; overflow: hidden; background: #0c0f15; border: 1px solid var(--line-2);
@@ -864,7 +871,7 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 
 .showcase-info { display: flex; flex-direction: column; gap: clamp(1.8rem, 3.4vw, 2.6rem); min-width: 0; }
 .showcase-copy { transition: opacity .28s var(--ease); }
-.is-swapping .showcase-copy { opacity: 0; }
+.is-swapping .showcase-copy, .is-info-swap .showcase-copy { opacity: 0; }
 .sc-kind { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--heat-txt); }
 .showcase-title { margin: .55rem 0 .5rem; font-size: clamp(1.8rem, 1.2rem + 2vw, 2.7rem); font-weight: 700; }
 .showcase-desc { color: var(--ink-soft); max-width: 42ch; }

@@ -331,7 +331,7 @@
 
   /* ------------------------------------------------------------ Showcase « aperçu PC + mobile »
      Maquette navigateur + téléphone qui défile entre les projets, parallaxe 3D à la souris.
-     Rotation auto 3,8 s (pause au survol / hors viewport / onglet caché), figée sous
+     Rotation auto 5,5 s (pause au survol / hors viewport / onglet caché), figée sous
      prefers-reduced-motion. Cliquer l'aperçu ouvre le site. */
   (function () {
     var showcase = $("[data-showcase]");
@@ -357,7 +357,7 @@
     var elDesc = q("[data-sc-desc]"), elLink = q("[data-sc-link]"), elTags = q("[data-sc-tags]");
     var tabsWrap = q("[data-sc-tabs]");
     var devicesEl = q("[data-devices]");
-    var INT = prefersReduced ? 0 : 3800;
+    var INT = prefersReduced ? 0 : 5500;
     showcase.style.setProperty("--sc-int", INT + "ms");
     var index = 0, timer = null, started = false;
 
@@ -387,10 +387,14 @@
       if (!fill) return;
       fill.style.animation = "none"; void fill.offsetWidth; fill.style.animation = "";
     }
-    function paint(i) {
+    function paintScreens(i) {
       var p = PROJECTS[i];
       if (elDesktop) { elDesktop.src = p.desktop; elDesktop.alt = p.name + " — aperçu du site (version ordinateur)"; }
       if (elMobile) elMobile.src = p.mobile;
+    }
+    function paint(i) { paintScreens(i); paintInfo(i); }
+    function paintInfo(i) {
+      var p = PROJECTS[i];
       if (elUrl) elUrl.textContent = p.host;
       if (elLink) elLink.href = p.url;
       if (elKind) elKind.textContent = p.kind;
@@ -406,13 +410,59 @@
       if (at && at.parentNode.scrollWidth > at.parentNode.clientWidth) at.parentNode.scrollTo({ left: at.offsetLeft - 16, behavior: prefersReduced ? "auto" : "smooth" });
       restartFill(i);
     }
+    /* Rotation en cube : le projet affiché (face avant, .devices) et le
+       suivant (un clone posé sur la face latérale) pivotent ensemble de 90°.
+       Au repos, la face avant n'a aucune transformation : rien ne bouge ni
+       ne floute entre deux rotations. */
+    var cube = q("[data-sc-cube]");
+    var TURN = 900, shown = 0, turning = false;
+    var decoded = function (imgs, ms) {
+      var all = Promise.all(imgs.map(function (im) { return im.decode ? im.decode().catch(function () {}) : null; }));
+      return Promise.race([all, new Promise(function (r) { setTimeout(r, ms); })]);
+    };
+    function turn() {
+      if (turning || shown === index) return;
+      turning = true;
+      var target = index, n = PROJECTS.length, p = PROJECTS[target];
+      var dir = (target - shown + n) % n <= n / 2 ? 1 : -1;
+      var face = devicesEl.cloneNode(true);
+      ["data-devices", "role", "tabindex", "aria-label"].forEach(function (a) { face.removeAttribute(a); });
+      face.classList.remove("is-clickable"); face.classList.add("sc-face-next"); face.setAttribute("aria-hidden", "true");
+      var d = face.querySelector("[data-sc-desktop]"), m = face.querySelector("[data-sc-mobile]");
+      d.removeAttribute("data-sc-desktop"); m.removeAttribute("data-sc-mobile");
+      d.alt = ""; m.loading = "eager"; d.src = p.desktop; m.src = p.mobile;
+      decoded([d, m], 800).then(function () {
+        var half = devicesEl.offsetWidth / 2;
+        face.style.transform = "rotateY(" + (dir * 90) + "deg) translateZ(" + half + "px)";
+        devicesEl.style.transform = "translateZ(" + half + "px)";
+        cube.style.transform = "translateZ(" + -half + "px)";
+        cube.appendChild(face);
+        void cube.offsetWidth;
+        cube.classList.add("is-turning");
+        cube.style.transform = "translateZ(" + -half + "px) rotateY(" + (-dir * 90) + "deg)";
+        setTimeout(function () {
+          paintScreens(target);
+          decoded([elDesktop, elMobile], 400).then(function () {
+            cube.classList.remove("is-turning");
+            cube.style.transform = ""; devicesEl.style.transform = "";
+            face.remove();
+            shown = target; turning = false;
+            turn(); // un autre projet a pu être choisi pendant la rotation
+          });
+        }, TURN);
+      });
+    }
     function go(i, animate) {
       index = (i + PROJECTS.length) % PROJECTS.length;
       warm(index + 1);
-      if (animate && !prefersReduced) {
+      if (animate && !prefersReduced && cube && window.Promise) {
+        showcase.classList.add("is-info-swap");
+        setTimeout(function () { paintInfo(index); showcase.classList.remove("is-info-swap"); }, 280);
+        turn();
+      } else if (animate && !prefersReduced) {
         showcase.classList.add("is-swapping");
-        setTimeout(function () { paint(index); showcase.classList.remove("is-swapping"); }, 220);
-      } else { paint(index); }
+        setTimeout(function () { paint(index); shown = index; showcase.classList.remove("is-swapping"); }, 220);
+      } else { paint(index); shown = index; }
     }
     function arm() { if (!INT) return; clearInterval(timer); timer = setInterval(function () { go(index + 1, true); }, INT); }
     function stop() { clearInterval(timer); }

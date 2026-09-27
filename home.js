@@ -4,6 +4,8 @@
    ===================================================================== */
 (function () {
   "use strict";
+  // Disposition de la maquette en test : visible seulement sur uploaded.be/?test
+  if (/[?&]test\b/.test(location.search)) document.documentElement.classList.add("layout-test");
   var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var finePointer = window.matchMedia("(pointer: fine)").matches;
   var STILL = /[?&]still\b/.test(window.location.search); /* mode capture : fige les entrées */

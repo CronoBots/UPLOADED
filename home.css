@@ -841,7 +841,7 @@ a.field-row:hover .idx { color: var(--heat-txt); }
   background: radial-gradient(60% 62% at 50% 42%, rgba(139,124,255,.20), transparent 72%);
   filter: blur(26px); pointer-events: none; }
 .devices { position: relative; width: min(100%, 580px); margin-inline: auto;
-  transform-style: preserve-3d; cursor: pointer; }
+  cursor: pointer; } /* pas de preserve-3d : le z-index garde le téléphone devant le PC */
 .devices.is-clickable:focus-visible { outline: 2px solid var(--heat); outline-offset: 10px; border-radius: 12px; }
 .laptop-device { position: relative; transform-style: preserve-3d; transition: transform .3s var(--ease); }
 .browser { border-radius: 12px; overflow: hidden; background: #0c0f15; border: 1px solid var(--line-2);

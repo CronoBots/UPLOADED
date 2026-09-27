@@ -898,8 +898,9 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 .showcase-info { display: flex; flex-direction: column; gap: clamp(1.8rem, 3.4vw, 2.6rem); min-width: 0; }
 .showcase-copy { transition: opacity .28s var(--ease); }
 .is-swapping .showcase-copy, .is-info-swap .showcase-copy { opacity: 0; }
-.sc-kind { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--heat-txt); }
-.showcase-title { margin: .55rem 0 .5rem; font-size: clamp(1.8rem, 1.2rem + 2vw, 2.7rem); font-weight: 700; }
+/* Nom en grand, puis description, puis la nature du site en petit, dessous */
+.sc-kind { margin-top: .7rem; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--heat-txt); }
+.showcase-title { margin: 0 0 .5rem; font-size: clamp(2rem, 1.3rem + 2.2vw, 2.9rem); font-weight: 700; }
 .showcase-desc { color: var(--ink-soft); max-width: 42ch; }
 .sc-tags { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; margin: 1.1rem 0 1.5rem; padding: 0; }
 .sc-tags li { padding: .32rem .7rem; font-size: .82rem; color: var(--ink-warm);
@@ -975,8 +976,8 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
   .sc-open { width: 100%; justify-content: center; }
   /* Fiche resserrée : titre, description et étiquettes tiennent en un écran */
   .showcase-stage { touch-action: pan-y; }
-  .sc-kind { font-size: .7rem; }
-  .showcase-title { margin: .35rem 0 .35rem; font-size: 1.65rem; }
+  .sc-kind { font-size: .66rem; margin-top: .55rem; }
+  .showcase-title { margin: 0 0 .4rem; font-size: 2.05rem; }
   .showcase-desc { font-size: .88rem; line-height: 1.5; max-width: none; }
   .sc-tags { gap: .35rem; margin: .85rem 0 1.1rem; }
   .sc-tags li { padding: .26rem .6rem; font-size: .76rem; }

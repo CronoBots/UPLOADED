@@ -415,6 +415,29 @@
       if (document.hidden) stop(); else if (started && !showcase.matches(":hover")) { restartFill(index); arm(); }
     });
 
+    /* Suivi de la souris : le PC et le téléphone s'inclinent vers le curseur
+       (profondeur 3D), en plus de la respiration. Les transforms portent sur
+       les enfants, pour composer avec le flottement de .devices sans l'écraser. */
+    if (finePointer && !prefersReduced) {
+      var stage = showcase.querySelector(".showcase-stage");
+      var laptop = showcase.querySelector(".laptop-device");
+      var phone = showcase.querySelector(".phone");
+      if (stage && laptop && phone) {
+        var clamp = function (v) { return v < -0.5 ? -0.5 : v > 0.5 ? 0.5 : v; };
+        var lastE = null, ticking = false;
+        var apply = function () {
+          ticking = false; if (!lastE) return;
+          var sr = stage.getBoundingClientRect();
+          var rx = clamp((lastE.clientX - sr.left) / sr.width - 0.5);
+          var ry = clamp((lastE.clientY - sr.top) / sr.height - 0.5);
+          laptop.style.transform = "rotateY(" + (rx * 9).toFixed(2) + "deg) rotateX(" + (-ry * 6).toFixed(2) + "deg)";
+          phone.style.transform = "translateZ(40px) rotateY(" + (rx * 15).toFixed(2) + "deg) rotateX(" + (-ry * 9).toFixed(2) + "deg)";
+        };
+        window.addEventListener("pointermove", function (e) { lastE = e; if (!ticking) { ticking = true; requestAnimationFrame(apply); } }, { passive: true });
+        document.addEventListener("mouseleave", function () { laptop.style.transform = ""; phone.style.transform = ""; });
+      }
+    }
+
   })();
 
   /* ------------------------------------------------------------ L'orbite des prestations

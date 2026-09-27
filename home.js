@@ -339,7 +339,7 @@
     var PROJECTS = [
       { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Un restaurant italien à Nandrin : la carte, la réservation et l'appel en un geste, depuis le téléphone.", tags: ["Carte en ligne", "Réservation", "Appel direct"] },
       { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Le site officiel d'un chanteur pop-rock, en français et en anglais : son album, ses clips, ses concerts.", tags: ["FR / EN", "Musique & clips", "Actus"] },
-      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
+      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", glow: .3, kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
       { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "L'univers d'une collection NFT sur la blockchain Cronos : les collections, le classement des détenteurs, un bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
     ];
     var warmed = {};
@@ -393,7 +393,7 @@
       if (elDesktop) { elDesktop.src = p.desktop; elDesktop.alt = p.name + " — aperçu du site (version ordinateur)"; }
       if (elMobile) elMobile.src = p.mobile;
     }
-    function paint(i) { paintScreens(i); paintInfo(i); }
+    function paint(i) { paintScreens(i); paintInfo(i); setAmbient(PROJECTS[i].desktop, PROJECTS[i].glow); }
     function paintInfo(i) {
       var p = PROJECTS[i];
       if (elUrl) elUrl.textContent = p.host;
@@ -416,6 +416,16 @@
        Au repos, la face avant n'a aucune transformation : rien ne bouge ni
        ne floute entre deux rotations. */
     var cube = q("[data-sc-cube]");
+    var ambient = q("[data-sc-ambient]");
+    function setAmbient(src, glow) {
+      if (!ambient) return;
+      ambient.style.setProperty("--glow", glow || .62); // un site clair éclaire moins fort qu'un site sombre
+      var imgs = ambient.querySelectorAll("img"), on = ambient.querySelector("img.on");
+      if (on && on.getAttribute("src") === src) return;
+      var next = imgs[0] === on ? imgs[1] : imgs[0];
+      next.onload = function () { next.classList.add("on"); if (on) on.classList.remove("on"); next.onload = null; };
+      next.src = src;
+    }
     var TURN = 900, shown = 0, turning = false;
     var decoded = function (imgs, ms) {
       var all = Promise.all(imgs.map(function (im) { return im.decode ? im.decode().catch(function () {}) : null; }));
@@ -433,6 +443,7 @@
       d.removeAttribute("data-sc-desktop"); m.removeAttribute("data-sc-mobile");
       d.alt = ""; m.loading = "eager"; d.src = p.desktop; m.src = p.mobile;
       decoded([d, m], 800).then(function () {
+        setAmbient(p.desktop, p.glow);
         var half = devicesEl.offsetWidth / 2;
         face.style.transform = "rotateY(" + (dir * 90) + "deg) translateZ(" + half + "px)";
         devicesEl.style.transform = "translateZ(" + half + "px)";
@@ -527,11 +538,15 @@
           var sr = stage.getBoundingClientRect();
           var rx = clamp((lastE.clientX - sr.left) / sr.width - 0.5);
           var ry = clamp((lastE.clientY - sr.top) / sr.height - 0.5);
-          laptop.style.transform = "perspective(1500px) rotateY(" + (rx * 9).toFixed(2) + "deg) rotateX(" + (-ry * 6).toFixed(2) + "deg)";
-          phone.style.transform = "perspective(1500px) rotateY(" + (rx * 9).toFixed(2) + "deg) rotateX(" + (-ry * 6).toFixed(2) + "deg)";
+          var tilt = " rotateY(" + (rx * 9).toFixed(2) + "deg) rotateX(" + (-ry * 6).toFixed(2) + "deg)";
+          // Parallaxe de profondeur : le téléphone (devant) se déplace plus que
+          // la tablette, le rétroéclairage (au fond) part dans l'autre sens.
+          laptop.style.transform = "perspective(1500px) translate(" + (rx * -6).toFixed(1) + "px," + (ry * -4).toFixed(1) + "px)" + tilt;
+          phone.style.transform = "perspective(1500px) translate(" + (rx * 16).toFixed(1) + "px," + (ry * 10).toFixed(1) + "px)" + tilt;
+          if (ambient) ambient.style.transform = "translate(" + (rx * -18).toFixed(1) + "px," + (ry * -12).toFixed(1) + "px)";
         };
         window.addEventListener("pointermove", function (e) { lastE = e; if (!ticking) { ticking = true; requestAnimationFrame(apply); } }, { passive: true });
-        document.addEventListener("mouseleave", function () { laptop.style.transform = ""; phone.style.transform = ""; });
+        document.addEventListener("mouseleave", function () { laptop.style.transform = ""; phone.style.transform = ""; if (ambient) ambient.style.transform = ""; });
       }
     }
 

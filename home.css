@@ -148,6 +148,11 @@ body::after {
   transition: width .5s var(--ease), height .5s var(--ease);
 }
 .masthead.is-scrolled .wordmark .dc { width: 30px; height: 30px; }
+/* Logo uploaded.be : hauteur fixe, largeur proportionnelle */
+.wordmark-img { display: block; height: 26px; width: auto; transition: height .5s var(--ease); }
+.masthead.is-scrolled .wordmark-img { height: 22px; }
+.wordmark--foot img { display: block; height: 34px; width: auto; }
+@media (max-width: 520px) { .wordmark-img { height: 22px; } .masthead.is-scrolled .wordmark-img { height: 20px; } }
 .w-mark { color: var(--heat); }
 
 .nav-links { display: flex; align-items: center; gap: clamp(1.25rem, 2.6vw, 2.5rem); }

@@ -42,6 +42,7 @@ body.legal-page .legal-nav {
   border-bottom: 1px solid var(--line) !important;
 }
 body.legal-page .legal-nav__brand { color: var(--ink) !important; font-family: var(--f-display); }
+.legal-nav__brand img { display: block; height: 22px; width: auto; }
 body.legal-page .legal-nav__brand .lw, body.legal-page .lw { color: var(--heat) !important; }
 .lw-amp { color: var(--heat-core); }
 body.legal-page .legal-nav__back { color: var(--ink-soft) !important; transition: color .2s ease; }

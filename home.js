@@ -337,10 +337,10 @@
     var showcase = $("[data-showcase]");
     if (!showcase) return;
     var PROJECTS = [
-      { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Restaurant italien & pizzas au feu de bois à Nandrin.", tags: ["Carte en ligne", "Réservation", "Appel en un geste"] },
-      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Site officiel du chanteur Jayden — rock, soul et poésie.", tags: ["Bilingue FR / EN", "Musique & vidéos", "Actualités"] },
-      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Institut de Head Spa japonais et de soins du visage.", tags: ["Rituels & tarifs", "Bons cadeaux", "Prise de rendez-vous"] },
-      { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "L'univers de la collection NFT Cryptonauts, sur la blockchain Cronos (Crypto.com).", tags: ["Collections", "Classement des détenteurs", "Bot de ventes"] }
+      { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Un restaurant italien à Nandrin : la carte, la réservation et l'appel en un geste, depuis le téléphone.", tags: ["Carte en ligne", "Réservation", "Appel direct"] },
+      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Le site officiel d'un chanteur pop-rock, en français et en anglais : son album, ses clips, ses concerts.", tags: ["FR / EN", "Musique & clips", "Actus"] },
+      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
+      { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "L'univers d'une collection NFT sur la blockchain Cronos : les collections, le classement des détenteurs, un bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
     ];
     var warmed = {};
     function warm(i) {
@@ -366,7 +366,8 @@
       devicesEl.setAttribute("role", "link");
       devicesEl.setAttribute("tabindex", "0");
       var openProject = function () { var u = PROJECTS[index] && PROJECTS[index].url; if (u) window.open(u, "_blank", "noopener"); };
-      devicesEl.addEventListener("click", openProject);
+      var swipedAt = 0;
+      devicesEl.addEventListener("click", function () { if (Date.now() - swipedAt > 500) openProject(); });
       devicesEl.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openProject(); } });
     }
 
@@ -420,11 +421,11 @@
       var all = Promise.all(imgs.map(function (im) { return im.decode ? im.decode().catch(function () {}) : null; }));
       return Promise.race([all, new Promise(function (r) { setTimeout(r, ms); })]);
     };
-    function turn() {
+    function turn(forced) {
       if (turning || shown === index) return;
       turning = true;
       var target = index, n = PROJECTS.length, p = PROJECTS[target];
-      var dir = (target - shown + n) % n <= n / 2 ? 1 : -1;
+      var dir = forced || ((target - shown + n) % n <= n / 2 ? 1 : -1);
       var face = devicesEl.cloneNode(true);
       ["data-devices", "role", "tabindex", "aria-label"].forEach(function (a) { face.removeAttribute(a); });
       face.classList.remove("is-clickable"); face.classList.add("sc-face-next"); face.setAttribute("aria-hidden", "true");
@@ -452,17 +453,39 @@
         }, TURN);
       });
     }
-    function go(i, animate) {
+    function go(i, animate, dir) {
       index = (i + PROJECTS.length) % PROJECTS.length;
       warm(index + 1);
       if (animate && !prefersReduced && cube && window.Promise) {
         showcase.classList.add("is-info-swap");
         setTimeout(function () { paintInfo(index); showcase.classList.remove("is-info-swap"); }, 280);
-        turn();
+        turn(dir);
       } else if (animate && !prefersReduced) {
         showcase.classList.add("is-swapping");
         setTimeout(function () { paint(index); shown = index; showcase.classList.remove("is-swapping"); }, 220);
       } else { paint(index); shown = index; }
+    }
+    /* Balayage gauche / droite sur la maquette (écrans tactiles) : vers la
+       gauche, projet suivant ; vers la droite, projet précédent. Le cube
+       tourne dans le sens du doigt. Le défilement vertical reste libre. */
+    var stageEl = q(".showcase-stage");
+    if (stageEl && devicesEl) {
+      var sx = 0, sy = 0, tracking = false;
+      stageEl.addEventListener("touchstart", function (e) {
+        if (e.touches.length !== 1) { tracking = false; return; }
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true;
+      }, { passive: true });
+      stageEl.addEventListener("touchend", function (e) {
+        if (!tracking) return;
+        tracking = false;
+        var t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+        swipedAt = Date.now();
+        if (!started) { started = true; showcase.classList.add("is-live"); }
+        var step = dx < 0 ? 1 : -1;
+        go(index + step, true, step);
+        arm();
+      }, { passive: true });
     }
     function arm() { if (!INT) return; clearInterval(timer); timer = setInterval(function () { go(index + 1, true); }, INT); }
     function stop() { clearInterval(timer); }

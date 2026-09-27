@@ -72,6 +72,19 @@
     }
   }
 
+  /* ---- Mobile : boutons flottants masqués sur la fiche d'un projet ---- */
+  var scInfo = $(".showcase-info");
+  if (scInfo && "IntersectionObserver" in window) {
+    var small = window.matchMedia("(max-width: 900px)");
+    var infoSeen = false;
+    var syncFab = function () { document.body.classList.toggle("fab-hidden", infoSeen && small.matches); };
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { infoSeen = e.isIntersecting; });
+      syncFab();
+    }, { threshold: 0 }).observe(scInfo);
+    if (small.addEventListener) small.addEventListener("change", syncFab);
+  }
+
   /* ---- Formulaire de contact (AJAX formsubmit, reste sur la page) ---- */
   (function () {
     var form = $("#contact-form");

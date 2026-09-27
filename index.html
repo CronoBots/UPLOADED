@@ -575,6 +575,41 @@
           </article>
         </div>
 
+        <div class="estimate reveal" id="estimate">
+          <div class="est-head">
+            <h3>Estimez votre projet</h3>
+            <p class="est-sub">Une fourchette indicative, en direct. Le devis, lui, reste ferme, détaillé et individuel.</p>
+          </div>
+          <div class="est-body">
+            <fieldset class="est-formulas">
+              <legend>Quelle formule&nbsp;?</legend>
+              <label class="est-opt"><input type="radio" name="est-formula" value="690" data-label="un site d'une page (landing)" /><span class="est-opt-k">Une seule page</span><span class="est-opt-p">dès 690&nbsp;€</span></label>
+              <label class="est-opt"><input type="radio" name="est-formula" value="1400" data-label="un site vitrine" checked /><span class="est-opt-k">Site vitrine</span><span class="est-opt-p">dès 1 400&nbsp;€</span></label>
+              <label class="est-opt"><input type="radio" name="est-formula" value="2400" data-label="un site avec réservation" /><span class="est-opt-k">Avec réservation</span><span class="est-opt-p">dès 2 400&nbsp;€</span></label>
+              <label class="est-opt"><input type="radio" name="est-formula" value="2900" data-label="une boutique en ligne" /><span class="est-opt-k">Boutique e-commerce</span><span class="est-opt-p">dès 2 900&nbsp;€</span></label>
+            </fieldset>
+            <div class="est-adds">
+              <div class="est-pages">
+                <label id="est-pages-lab" for="est-pages-n">Pages supplémentaires <small>+150&nbsp;€/page</small></label>
+                <div class="est-stepper">
+                  <button type="button" class="est-step" data-step="-1" aria-label="Retirer une page">−</button>
+                  <input type="number" id="est-pages-n" value="0" min="0" max="20" step="1" inputmode="numeric" aria-labelledby="est-pages-lab" />
+                  <button type="button" class="est-step" data-step="1" aria-label="Ajouter une page">+</button>
+                </div>
+              </div>
+              <label class="est-maint"><input type="checkbox" id="est-maint" /><span>Suivi mensuel <small>+25&nbsp;€/mois, 3 mois compris</small></span></label>
+            </div>
+          </div>
+          <div class="est-out" aria-live="polite">
+            <p class="est-total">
+              <span class="est-total-lab">Estimation indicative</span>
+              <strong id="est-amount">dès 1 400 €</strong>
+              <span class="est-total-m" id="est-month"></span>
+            </p>
+            <a href="#commande" class="btn btn--mark" id="est-cta" data-prefill="">Demander mon devis <span class="btn-ar" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
         <div class="budget-notes reveal">
           <div class="bnote">
             <h3>Et après&nbsp;?</h3>

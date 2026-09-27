@@ -415,4 +415,49 @@
     }
   })();
 
+  /* ------------------------------------------------------------ Estimateur de budget
+     Fourchette indicative en direct. Aucune valeur figee : le CTA pre-remplit le
+     message de contact avec la configuration choisie, sans ecraser un texte deja saisi. */
+  (function () {
+    var root = $("#estimate"); if (!root) return;
+    var amount = $("#est-amount"), month = $("#est-month"), cta = $("#est-cta");
+    var pagesInput = $("#est-pages-n"), maint = $("#est-maint");
+    if (!amount || !cta || !pagesInput || !maint) return;
+
+    var eur = function (n) { return n.toLocaleString("fr-FR") + " €"; };
+    function lu(sel) { return root.querySelector(sel); }
+
+    function update() {
+      var r = lu('input[name="est-formula"]:checked');
+      var base = r ? Number(r.value) : 0, label = r ? r.getAttribute("data-label") : "";
+      var pages = Math.max(0, Math.min(20, parseInt(pagesInput.value, 10) || 0));
+      pagesInput.value = pages;
+      var total = base + pages * 150;
+
+      amount.textContent = "dès " + eur(total);
+      month.textContent = maint.checked ? "+ 25 €/mois" : "";
+      $$(".est-opt", root).forEach(function (o) { o.classList.toggle("is-on", o.querySelector("input").checked); });
+
+      var msg = "Bonjour, je souhaite " + label;
+      var s = pages > 1 ? "s" : "";
+      if (pages > 0) msg += " avec " + pages + " page" + s + " supplémentaire" + s;
+      if (maint.checked) msg += (pages > 0 ? " et" : " avec") + " un suivi mensuel";
+      msg += ". Estimation indicative : dès " + eur(total) + (maint.checked ? " + 25 €/mois" : "") + ". ";
+      cta.setAttribute("data-prefill", msg);
+    }
+
+    root.addEventListener("input", update);
+    root.addEventListener("click", function (e) {
+      var b = e.target.closest(".est-step"); if (!b) return;
+      pagesInput.value = (parseInt(pagesInput.value, 10) || 0) + Number(b.getAttribute("data-step"));
+      update();
+    });
+    cta.addEventListener("click", function () {
+      var m = $("#message");
+      if (m && !m.value.trim()) m.value = cta.getAttribute("data-prefill");
+      if (m) setTimeout(function () { m.focus(); }, 420);
+    });
+    update();
+  })();
+
 })();

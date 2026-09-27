@@ -177,15 +177,15 @@
         .then(function (res) {
           setLoading(false);
           if (res.ok) {
-            showSuccess("Merci " + name + " ! Votre demande est envoyée, je vous réponds à " + email + " sous 24 h.");
+            showSuccess("Merci " + name + " ! Votre demande est envoyée, je vous réponds à " + email + " sous 24 h.");
             form.reset();
           } else {
-            showFallback("Un souci est survenu. Réessayez, appelez-moi au 0460 96 21 46, ou :");
+            showFallback("Un souci est survenu. Réessayez, appelez-moi au 0460 96 21 46, ou :");
           }
         })
         .catch(function () {
           setLoading(false);
-          showFallback("Connexion impossible. Réessayez, appelez-moi au 0460 96 21 46, ou :");
+          showFallback("Connexion impossible. Réessayez, appelez-moi au 0460 96 21 46, ou :");
         });
     });
   })();
@@ -337,10 +337,10 @@
     var showcase = $("[data-showcase]");
     if (!showcase) return;
     var PROJECTS = [
-      { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Un restaurant italien à Nandrin : la carte, la réservation et l'appel en un geste, depuis le téléphone.", tags: ["Carte en ligne", "Réservation", "Appel direct"] },
-      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Le site officiel d'un chanteur pop-rock, en français et en anglais : son album, ses clips, ses concerts.", tags: ["FR / EN", "Musique & clips", "Actus"] },
-      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
-      { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "L'univers d'une collection NFT sur la blockchain Cronos : les collections, le classement des détenteurs, un bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
+      { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Un restaurant italien à Nandrin : la carte, la réservation et l'appel en un geste, depuis le téléphone.", tags: ["Carte en ligne", "Réservation", "Appel direct"] },
+      { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Le site officiel d'un chanteur pop-rock, en français et en anglais : son album, ses clips, ses concerts.", tags: ["FR / EN", "Musique & clips", "Actus"] },
+      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
+      { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "L'univers d'une collection NFT sur la blockchain Cronos : les collections, le classement des détenteurs, un bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
     ];
     var warmed = {};
     function warm(i) {
@@ -553,7 +553,7 @@
       { n: "Site vitrine sur mesure",
         i: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18"/><path d="M6.6 6.6h.01M9.2 6.6h.01"/>',
         d: "Présenter votre activité, inspirer confiance et recevoir des appels. Dessiné pour vous, jamais posé sur un thème acheté. C'est le besoin de neuf clients sur dix.",
-        t: ["5 à 10 pages", "Référencement local", "Mobile d'abord", "Prise en main"],
+        t: ["5 à 10 pages", "Référencement local", "Mobile d'abord", "Prise en main"],
         u: "/creation-site-web-liege/", ul: "Voir la page Liège & Neupré" },
       { n: "Boutique & réservation",
         i: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
@@ -645,7 +645,7 @@
     var pagesInput = $("#est-pages-n"), maint = $("#est-maint");
     if (!amount || !cta || !pagesInput || !maint) return;
 
-    var eur = function (n) { return n.toLocaleString("fr-FR") + " €"; };
+    var eur = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0") + "\u00a0€"; }; // espaces insécables : « 1 400 € » ne se coupe pas et reste lisible quelle que soit la police
     function lu(sel) { return root.querySelector(sel); }
 
     function update() {
@@ -656,14 +656,14 @@
       var total = base + pages * 150;
 
       amount.textContent = "dès " + eur(total);
-      month.textContent = maint.checked ? "+ 25 €/mois" : "";
+      month.textContent = maint.checked ? "+ 25 €/mois" : "";
       $$(".est-opt", root).forEach(function (o) { o.classList.toggle("is-on", o.querySelector("input").checked); });
 
       var msg = "Bonjour, je souhaite " + label;
       var s = pages > 1 ? "s" : "";
       if (pages > 0) msg += " avec " + pages + " page" + s + " supplémentaire" + s;
       if (maint.checked) msg += (pages > 0 ? " et" : " avec") + " un suivi mensuel";
-      msg += ". Estimation indicative : dès " + eur(total) + (maint.checked ? " + 25 €/mois" : "") + ". ";
+      msg += ". Estimation indicative : dès " + eur(total) + (maint.checked ? " + 25 €/mois" : "") + ". ";
       cta.setAttribute("data-prefill", msg);
     }
 

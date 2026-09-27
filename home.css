@@ -936,10 +936,18 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
 @media (max-width: 900px) {
   .showcase { grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
   .showcase-stage { order: -1; padding-bottom: clamp(3.4rem, 9vw, 5rem); }
-  .sc-dots { display: flex; justify-content: center; gap: 8px; margin-top: 1rem; }
-  .sc-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(242,238,230,.2); cursor: pointer;
-    transition: background .3s var(--ease), width .3s var(--ease); }
-  .sc-dots span.on { width: 20px; border-radius: 4px; background: var(--heat); }
+  .sc-dots { display: flex; justify-content: center; gap: 2px; margin-top: .6rem; }
+  .sc-dots button { padding: 10px 4px; background: none; border: 0; cursor: pointer; } /* zone d'appui ≈ 24 px */
+  .sc-dots button::before { content: ""; display: block; width: 7px; height: 7px; border-radius: 4px;
+    background: rgba(242,238,230,.22); transition: background .3s var(--ease), width .3s var(--ease); }
+  .sc-dots button.on::before { width: 20px; background: var(--heat); }
+  .sc-dots button:focus-visible { outline: 2px solid var(--heat); outline-offset: -2px; border-radius: 8px; }
+  /* Fiche centrée sous les points ; étiquettes, bouton et liste 01–04
+     retirés : un appui sur la maquette ouvre le site, les points et le
+     balayage changent de projet. */
+  .showcase-info { text-align: center; align-items: center; }
+  .showcase-desc { margin-inline: auto; }
+  .sc-tags, .sc-open, .sc-list { display: none; }
   .phone { right: -5%; }
   .sc-list { position: relative; flex-direction: row; gap: .5rem; border-top: 0; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--pad) * -1); padding-inline: var(--pad); }
   .sc-list::-webkit-scrollbar { display: none; }

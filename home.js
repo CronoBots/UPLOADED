@@ -339,7 +339,7 @@
     var PROJECTS = [
       { host: "pizzeriapino.be", url: "https://pizzeriapino.be/", desktop: "img/pizzapino-desktop.webp?v=7", mobile: "img/pizzapino-mobile.webp?v=8", name: "Pizzeria Pino", kind: "Site web · Restaurant italien", desc: "Un restaurant italien à Nandrin : la carte, la réservation et l'appel en un geste, depuis le téléphone.", tags: ["Carte en ligne", "Réservation", "Appel direct"] },
       { host: "jaydenmusic.com", url: "https://jaydenmusic.com/", desktop: "img/jaydenmusic-desktop.webp?v=7", mobile: "img/jaydenmusic-mobile.webp?v=8", name: "Jayden", kind: "Site web · Artiste musical", desc: "Le site officiel d'un chanteur pop-rock, en français et en anglais : son album, ses clips, ses concerts.", tags: ["FR / EN", "Musique & clips", "Actus"] },
-      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", glow: .3, kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
+      { host: "yumea-wellness.be", url: "https://yumea-wellness.be/", desktop: "img/yumea-desktop.webp?v=7", mobile: "img/yumea-mobile.webp?v=8", name: "Yuméa Wellness", glow: .08, kind: "Site web · Bien-être & Head Spa", desc: "Un institut de Head Spa japonais : les rituels et leurs tarifs, les bons cadeaux, la prise de rendez-vous.", tags: ["Rituels & tarifs", "Bons cadeaux", "Rendez-vous"] },
       { host: "crypto-nauts.com", url: "https://crypto-nauts.com/", desktop: "img/cryptonauts-desktop.webp?v=1", mobile: "img/cryptonauts-mobile.webp?v=1", name: "Cryptonauts", kind: "Site web · Collection NFT", desc: "Une collection NFT sur la blockchain Cronos : ses collections, son classement, son bot de ventes.", tags: ["Collections", "Classement", "Bot de ventes"] }
     ];
     var warmed = {};
@@ -382,11 +382,12 @@
       return b;
     });
 
-    // Points sous la maquette (mobile) : repère visuel, les onglets restent l'accès clavier
+    // Points sous la maquette (mobile et tablette, où la liste des projets est masquée)
     var dotsWrap = q("[data-sc-dots]");
     var dots = PROJECTS.map(function (p, i) {
       if (!dotsWrap) return null;
-      var d = document.createElement("span");
+      var d = document.createElement("button");
+      d.type = "button"; d.setAttribute("aria-label", p.name);
       d.addEventListener("click", function () { if (!started) { started = true; showcase.classList.add("is-live"); } go(i, true); arm(); });
       dotsWrap.appendChild(d);
       return d;
@@ -416,7 +417,7 @@
       }
       if (devicesEl) devicesEl.setAttribute("aria-label", "Ouvrir le site " + p.name + " (" + p.host + ")");
       tabs.forEach(function (t, k) { t.classList.toggle("active", k === i); t.setAttribute("aria-selected", k === i ? "true" : "false"); });
-      dots.forEach(function (d, k) { d.classList.toggle("on", k === i); });
+      dots.forEach(function (d, k) { d.classList.toggle("on", k === i); d.setAttribute("aria-current", k === i ? "true" : "false"); });
       var at = tabs[i];
       if (at && at.parentNode.scrollWidth > at.parentNode.clientWidth) at.parentNode.scrollTo({ left: at.offsetLeft - 16, behavior: prefersReduced ? "auto" : "smooth" });
       restartFill(i);

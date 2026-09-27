@@ -416,8 +416,7 @@
     });
 
     /* Suivi de la souris : le PC et le téléphone s'inclinent vers le curseur
-       (profondeur 3D), en plus de la respiration. Les transforms portent sur
-       les enfants, pour composer avec le flottement de .devices sans l'écraser. */
+       (profondeur 3D). Seul mouvement de la maquette : elle ne flotte plus. */
     if (finePointer && !prefersReduced) {
       var stage = showcase.querySelector(".showcase-stage");
       var laptop = showcase.querySelector(".laptop-device");

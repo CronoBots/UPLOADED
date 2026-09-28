@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://uploaded.be/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://uploaded.be/</loc><lastmod>2026-09-28</lastmod><changefreq>monthly</changefreq><priority>1.0</priority></url>
   <url><loc>https://uploaded.be/creation-site-web-liege/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://uploaded.be/creation-site-web-seraing/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://uploaded.be/creation-site-web-huy/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
@@ -10,8 +10,8 @@
   <url><loc>https://uploaded.be/blog/prix-site-web-belgique/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://uploaded.be/blog/wordpress-ou-site-sur-mesure/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://uploaded.be/blog/etre-trouve-sur-google-commerce-local/</loc><lastmod>2026-09-18</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://uploaded.be/mentions-legales/</loc><lastmod>2026-09-18</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
-  <url><loc>https://uploaded.be/conditions-generales/</loc><lastmod>2026-09-18</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://uploaded.be/mentions-legales/</loc><lastmod>2026-09-28</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://uploaded.be/conditions-generales/</loc><lastmod>2026-09-28</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
   <url><loc>https://uploaded.be/politique-confidentialite/</loc><lastmod>2026-09-18</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
   <url><loc>https://uploaded.be/politique-cookies/</loc><lastmod>2026-09-18</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
 </urlset>

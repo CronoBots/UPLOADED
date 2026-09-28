@@ -66,7 +66,8 @@ des pages locales, tableaux du blog, et `OfferCatalog` du JSON-LD de `index.html
 | Une seule page (landing) | à partir de 690 € |
 | Site vitrine, 5 à 10 pages | 1 400 – 2 800 € |
 | Boutique ou réservation | à partir de 2 900 € |
-| Suivi mensuel | à partir de 25 €/mois, 3 premiers mois compris |
+| Formule Essentielle | 39 €/mois ou 429 €/an (un mois offert) : hébergement, domaine, e-mail pro, sécurité, maintenance, mises à jour |
+| Formule Complète | 59 €/mois ou 649 €/an (un mois offert) : Essentielle + avis Google en direct, réponses automatiques, mur social, tableau de bord |
 
 Pour les modifier, chercher ces montants dans `index.html`, les trois `creation-site-web-*.html`
 et `blog/prix-site-web-belgique.html`, sans oublier le `OfferCatalog` en tête de `index.html`.

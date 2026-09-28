@@ -701,8 +701,8 @@
   (function () {
     var root = $("#estimate"); if (!root) return;
     var amount = $("#est-amount"), month = $("#est-month"), cta = $("#est-cta");
-    var pagesInput = $("#est-pages-n"), maint = $("#est-maint");
-    if (!amount || !cta || !pagesInput || !maint) return;
+    var pagesInput = $("#est-pages-n");
+    if (!amount || !cta || !pagesInput) return;
 
     var eur = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0") + "\u00a0€"; }; // espaces insécables : « 1 400 € » ne se coupe pas et reste lisible quelle que soit la police
     function lu(sel) { return root.querySelector(sel); }
@@ -715,14 +715,16 @@
       var total = base + pages * 150;
 
       amount.textContent = "dès " + eur(total);
-      month.textContent = maint.checked ? "+ 25 €/mois" : "";
+      var sub = lu('input[name="est-sub"]:checked');
+      var subM = sub ? Number(sub.value) : 0, subL = sub ? sub.getAttribute("data-label") : "";
+      month.textContent = subM ? "+ " + subM + "\u00a0€/mois (" + subL.replace("la formule ", "") + ")" : "";
       $$(".est-opt", root).forEach(function (o) { o.classList.toggle("is-on", o.querySelector("input").checked); });
 
       var msg = "Bonjour, je souhaite " + label;
       var s = pages > 1 ? "s" : "";
       if (pages > 0) msg += " avec " + pages + " page" + s + " supplémentaire" + s;
-      if (maint.checked) msg += (pages > 0 ? " et" : " avec") + " un suivi mensuel";
-      msg += ". Estimation indicative : dès " + eur(total) + (maint.checked ? " + 25 €/mois" : "") + ". ";
+      if (subM) msg += (pages > 0 ? " et" : " avec") + " " + subL;
+      msg += ". Estimation indicative : dès " + eur(total) + (subM ? " + " + subM + "\u00a0€/mois" : "") + ". ";
       cta.setAttribute("data-prefill", msg);
     }
 

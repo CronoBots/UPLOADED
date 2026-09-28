@@ -42,7 +42,7 @@ Prospection entrante via le site (Google, bouche-à-oreille). Le visiteur lit su
 
 Réalisations réelles (images dans /img, cyclées par le showcase) : Jayden (site artiste musique), Yuméa (Head Spa / bien-être), Toukin (kinésithérapie, Tolochenaz), Pizza Pino (restaurant italien, Nandrin), Oryxia (gravure laser), Betsfix (API paris sportifs), Cryptonauts (collection NFT sur Crypto.com). Pas de témoignages clients rédigés ni de logos clients sur le site actuel — ne pas en inventer. Le « 25 ans d'expérience » et « interlocuteur unique » sont des faits de marque assumés.
 
-**Tarifs affichés depuis septembre 2026** (arbitrage du client, contre la règle « aucun tarif » précédente) : landing à partir de 690 €, vitrine 1 400 – 2 800 €, boutique à partir de 2 900 €, suivi à partir de 25 €/mois avec trois mois compris. Ce sont des ordres de grandeur alignés sur le marché belge — à confirmer par Vincent avant toute campagne. Recensement exact des endroits où ils figurent : voir README.
+**Tarifs affichés depuis septembre 2026** (arbitrage du client, contre la règle « aucun tarif » précédente) : landing à partir de 690 €, vitrine 1 400 – 2 800 €, boutique à partir de 2 900 €, abonnement Essentielle 39 €/mois (429 €/an) ou Complète 59 €/mois (649 €/an), hors TVA, TVA non applicable (art. 56 bis), repris de la proposition commerciale remise à Pizzeria Pino. Ce sont des ordres de grandeur alignés sur le marché belge — à confirmer par Vincent avant toute campagne. Recensement exact des endroits où ils figurent : voir README.
 
 ## Product Principles
 

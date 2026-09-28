@@ -35,7 +35,7 @@
   <link rel="preload" as="font" type="font/woff2" href="fonts/bricolage-grotesque-latin.woff2" crossorigin />
   <link rel="preload" as="font" type="font/woff2" href="fonts/libre-franklin-latin.woff2" crossorigin />
   <link rel="stylesheet" href="fonts.css?v=20260911" />
-  <link rel="stylesheet" href="home.css?v=20260928q" />
+  <link rel="stylesheet" href="home.css?v=20260928r" />
 
   <script type="application/ld+json">
 {
@@ -226,19 +226,42 @@
         },
         {
           "@type": "Offer",
-          "name": "Hébergement, maintenance et évolutions",
-          "description": "Hébergement, sauvegardes, mises à jour de sécurité et petites évolutions. Les trois premiers mois sont compris avec chaque site.",
+          "name": "Formule Essentielle",
+          "description": "Hébergement, certificat de sécurité, nom de domaine, adresse e-mail professionnelle, sauvegardes, maintenance et mises à jour du contenu à la demande. 429 € par an avec un mois offert.",
           "priceSpecification": {
             "@type": "UnitPriceSpecification",
-            "minPrice": 25,
+            "price": 39,
             "priceCurrency": "EUR",
             "unitText": "MONTH",
-            "billingIncrement": 1
+            "billingIncrement": 1,
+            "valueAddedTaxIncluded": false
           },
           "availability": "https://schema.org/InStock",
           "itemOffered": {
             "@type": "Service",
-            "name": "Maintenance de site web",
+            "name": "Hébergement et maintenance de site web",
+            "serviceType": "Maintenance de site web",
+            "provider": {
+              "@id": "https://uploaded.be/#organization"
+            }
+          }
+        },
+        {
+          "@type": "Offer",
+          "name": "Formule Complète",
+          "description": "Tout l'Essentielle, plus les avis Google affichés en direct, les réponses automatiques aux avis, le mur Instagram et Facebook et un tableau de bord de fréquentation sans cookie. 649 € par an avec un mois offert.",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": 59,
+            "priceCurrency": "EUR",
+            "unitText": "MONTH",
+            "billingIncrement": 1,
+            "valueAddedTaxIncluded": false
+          },
+          "availability": "https://schema.org/InStock",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Hébergement, maintenance, avis et réseaux sociaux",
             "serviceType": "Maintenance de site web",
             "provider": {
               "@id": "https://uploaded.be/#organization"
@@ -508,6 +531,7 @@
           <p class="lead">Chaque projet est différent, donc je ne vends pas de forfait tout fait. Mais vous avez le droit de savoir dans quel ordre de grandeur vous entrez avant de m'écrire. Voici la vérité.</p>
         </div>
 
+        <h3 class="budget-step"><span class="budget-n">1</span> La création <small>une seule fois</small></h3>
         <div class="tiers">
           <article class="tier reveal">
             <p class="tier-kind">Une seule page</p>
@@ -543,6 +567,38 @@
           </article>
         </div>
 
+        <h3 class="budget-step"><span class="budget-n">2</span> L'abonnement <small>chaque mois</small></h3>
+        <div class="subs">
+          <article class="tier sub reveal">
+            <p class="tier-kind">Formule Essentielle</p>
+            <p class="tier-price">39 <span class="tier-cur">€</span><span class="tier-per">/mois</span></p>
+            <p class="sub-year">ou 429 € par an, un mois offert</p>
+            <p class="tier-for">Votre site en ligne, sûr et à jour, sans rien avoir à gérer.</p>
+            <ul class="tier-list">
+              <li>Hébergement et certificat de sécurité</li>
+              <li>Nom de domaine et adresse e-mail professionnelle</li>
+              <li>Sauvegardes, surveillance et maintenance</li>
+              <li>Mises à jour de vos contenus à la demande</li>
+              <li>Un numéro qui répond, sans ticket ni formulaire</li>
+            </ul>
+          </article>
+          <article class="tier tier--lead sub reveal d1">
+            <p class="tier-kind">Formule Complète</p>
+            <p class="tier-price">59 <span class="tier-cur">€</span><span class="tier-per">/mois</span></p>
+            <p class="sub-year">ou 649 € par an, un mois offert</p>
+            <p class="tier-for">Le site qui travaille pour vous&nbsp;: il rassure, il vit et il se mesure.</p>
+            <ul class="tier-list">
+              <li><b>Tout l'Essentielle</b>, et en plus&nbsp;:</li>
+              <li>Vos avis Google affichés en direct</li>
+              <li>Une réponse soignée à chaque avis, automatiquement</li>
+              <li>Vos publications Instagram et Facebook sur le site</li>
+              <li>Un tableau de bord de vos visites, sans cookie</li>
+            </ul>
+            <p class="sub-save">84 € par mois si pris à la carte</p>
+            <p class="tier-flag">Recommandé</p>
+          </article>
+        </div>
+
         <div class="estimate reveal" id="estimate">
           <div class="est-head">
             <h3>Estimez votre projet</h3>
@@ -565,7 +621,12 @@
                   <button type="button" class="est-step" data-step="1" aria-label="Ajouter une page">+</button>
                 </div>
               </div>
-              <label class="est-maint"><input type="checkbox" id="est-maint" /><span>Suivi mensuel <small>+25&nbsp;€/mois, 3 mois compris</small></span></label>
+              <fieldset class="est-formulas est-subs">
+                <legend>Abonnement</legend>
+                <label class="est-opt"><input type="radio" name="est-sub" value="0" data-label="" /><span class="est-opt-k">Sans</span><span class="est-opt-p">plus tard</span></label>
+                <label class="est-opt"><input type="radio" name="est-sub" value="39" data-label="la formule Essentielle" /><span class="est-opt-k">Essentielle</span><span class="est-opt-p">39&nbsp;€/mois</span></label>
+                <label class="est-opt"><input type="radio" name="est-sub" value="59" data-label="la formule Complète" checked /><span class="est-opt-k">Complète</span><span class="est-opt-p">59&nbsp;€/mois</span></label>
+              </fieldset>
             </div>
           </div>
           <div class="est-out" aria-live="polite">
@@ -580,8 +641,8 @@
 
         <div class="budget-notes reveal">
           <div class="bnote">
-            <h3>Et après&nbsp;?</h3>
-            <p>Hébergement, sauvegardes, mises à jour de sécurité et petites évolutions&nbsp;: <b>à partir de 25 €/mois</b>. Les trois premiers mois sont compris avec chaque site. Vous pouvez arrêter quand vous voulez, et vous partez avec votre site&nbsp;: il vous appartient.</p>
+            <h3>Sans engagement</h3>
+            <p>L'abonnement démarre à la mise en ligne. Au mois, vous arrêtez quand vous voulez&nbsp;; à l'année, un mois est offert. Votre nom de domaine, votre e-mail et votre fiche Google sont à votre nom, et vous partez avec les fichiers de votre site.</p>
           </div>
           <div class="bnote">
             <h3>Pourquoi pas moins cher&nbsp;?</h3>
@@ -593,7 +654,7 @@
           </div>
         </div>
 
-        <p class="budget-foot reveal">Ces montants sont des ordres de grandeur honnêtes, pas un tarif affiché&nbsp;: votre devis, lui, sera ferme et détaillé. <a href="#commande" class="reg-link">Décrivez-moi votre projet <span aria-hidden="true">↗</span></a></p>
+        <p class="budget-foot reveal">Ces montants sont des ordres de grandeur honnêtes, pas un tarif affiché&nbsp;: votre devis, lui, sera ferme et détaillé. <a href="#commande" class="reg-link">Décrivez-moi votre projet <span aria-hidden="true">↗</span></a> <span class="budget-tva">Montants hors TVA&nbsp;: TVA non applicable, article 56&nbsp;bis du Code de la TVA.</span></p>
       </div>
     </section>
 
@@ -820,7 +881,7 @@
     </div>
   </div>
 
-  <script src="home.js?v=20260928q"></script>
+  <script src="home.js?v=20260928r"></script>
   <script src="cookies.js?v=20260911" defer></script>
 </body>
 </html>

@@ -675,6 +675,21 @@ body.fab-hidden .wa-fab, body.fab-hidden .to-top.show { opacity: 0; visibility: 
   color: #14100a; background: linear-gradient(135deg, var(--heat-core), var(--heat)); border-radius: 20px;
 }
 
+/* Deux temps : la création (une fois), puis l'abonnement (chaque mois) */
+.budget-step { display: flex; align-items: baseline; gap: .7rem; margin: 0 0 1.1rem; font-size: clamp(1.25rem, 1rem + .9vw, 1.6rem); font-weight: 700; color: var(--ink); }
+.budget-step small { font-family: var(--f-mono); font-size: .74rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--heat-txt); }
+.budget-n { display: inline-grid; place-items: center; width: 1.7em; height: 1.7em; flex: 0 0 auto; align-self: center; border-radius: 50%; font-size: .72em; color: var(--heat-core); background: rgba(72,132,216,.12); border: 1px solid var(--line-heat); }
+.subs + .estimate, .tiers + .budget-step { margin-top: clamp(2.2rem, 4vw, 3.2rem); }
+.subs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(1rem, 2.2vw, 1.8rem); align-items: stretch; }
+.tier-per { font-family: var(--f-body); font-size: .9rem; font-weight: 500; letter-spacing: 0; color: var(--ink-dim); margin-left: .2rem; }
+.sub-year { margin-top: .35rem; font-family: var(--f-mono); font-size: .78rem; color: var(--heat-txt); }
+.sub .tier-list b { color: var(--ink); }
+.sub-save { margin-top: 1rem; font-size: .84rem; color: var(--ink-dim); }
+.budget-tva { display: block; margin-top: .4rem; font-size: .84rem; color: var(--ink-dim); }
+.est-subs { grid-template-columns: repeat(3, 1fr) !important; }
+.est-subs .est-opt { padding: .6rem .7rem; }
+.est-subs .est-opt-k { font-size: .92rem; }
+@media (max-width: 700px) { .subs { grid-template-columns: 1fr; } .subs .tier--lead { order: -1; } }
 .budget-notes { margin-top: clamp(1.6rem, 3vw, 2.4rem); display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1rem, 2.2vw, 1.8rem); }
 .bnote { padding: clamp(1.2rem, 2.2vw, 1.6rem); border: 1px solid var(--line); border-left: 2px solid var(--line-heat); border-radius: 0 12px 12px 0; background: rgba(19,26,40,.4); }
 .bnote h3 { font-size: 1.02rem; font-weight: 700; color: var(--ink); }

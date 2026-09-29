@@ -566,6 +566,16 @@ body::after {
   .works__grid { grid-template-columns: 1fr; }
   .stats__grid { grid-template-columns: repeat(2,1fr); }
   .colophon__cols { grid-template-columns: 1fr 1fr; }
+
+  /* Process : passe en vertical (ligne lumineuse verticale) */
+  .process__pin { height: auto; overflow: visible; display: block; padding-block: 14vh; }
+  .process__head { padding-top: 0; margin-bottom: 32px; }
+  .process__track { position: relative; padding-left: 44px; }
+  .process__line { top: 0; bottom: 0; left: 20px; right: auto; width: 2px; height: auto; }
+  .process__line span { position: absolute; top: 0; left: 0; width: 100%; height: 0; }
+  .process__steps { flex-direction: column; padding: 0; gap: 16px; align-items: stretch; }
+  .pstep { flex: 0 0 auto; width: auto; }
+  .pstep.is-active { transform: translateY(0) translateX(4px); }
 }
 @media (max-width: 560px) {
   :root { --nav-h: 64px; }

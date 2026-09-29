@@ -314,107 +314,122 @@
      ========================================================= */
   function initScenes() {
     if (!hasGSAP) return;
+
+    /* ---- Intro HERO : reveal du titre (tous écrans) ---- */
+    if (!prefersReduced) {
+      const heroLines = $$('.hero__title .line__inner');
+      gsap.set(heroLines, { yPercent: 110 });
+      gsap.to(heroLines, { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'expo.out', delay: 0.25 });
+      gsap.from('.hero__eyebrow, .hero__sub, .hero__actions', { y: 24, opacity: 0, duration: 1, stagger: 0.12, ease: 'power3.out', delay: 0.5 });
+    }
+
     const mm = gsap.matchMedia();
 
-    /* -------- commun (desktop + mobile léger) -------- */
-    mm.add('(min-width: 901px)', () => {
-      /* ---- HERO : caméra avance, particules convergent ---- */
-      const heroTitleLines = $$('.hero__title .line__inner');
-      gsap.set(heroTitleLines, { yPercent: 110 });
-      gsap.to(heroTitleLines, { yPercent: 0, duration: 1.1, stagger: 0.12, ease: 'expo.out', delay: 0.2 });
-      gsap.from('.hero__eyebrow, .hero__sub, .hero__actions', { y: 24, opacity: 0, duration: 1, stagger: 0.12, ease: 'power3.out', delay: 0.5 });
+    /* Les MÊMES animations tournent partout ; on n'adapte que la mécanique :
+       desktop = sections "pinned" ; mobile = scroll-through (pas de pin sur les
+       sections trop hautes) + process vertical. Le scroll pilote tout dans les 2 cas. */
+    mm.add({ isDesktop: '(min-width: 901px)', isMobile: '(max-width: 900px)' }, (ctx) => {
+      const { isDesktop } = ctx.conditions;
+      const st = (desktop, mobile) => (isDesktop ? desktop : mobile);
 
-      const heroTl = gsap.timeline({
-        scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=110%', pin: '.hero__pin', scrub: true },
-      });
-      heroTl.to('.hero__content', { scale: 1.12, y: -40, opacity: 0, ease: 'none' }, 0)
-            .to('.hero__scroll', { opacity: 0, ease: 'none' }, 0)
-            .to({}, { duration: 1, onUpdate() { if (fields.hero) fields.hero.setEnergy(this.progress()); } }, 0);
+      /* ================= HERO — caméra + énergie (pin sur les 2, centré) ================= */
+      gsap.timeline({ scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=110%', pin: '.hero__pin', scrub: true } })
+        .to('.hero__content', { scale: isDesktop ? 1.12 : 1.06, y: -40, opacity: 0, ease: 'none' }, 0)
+        .to('.hero__scroll', { opacity: 0, ease: 'none' }, 0)
+        .to({}, { onUpdate() { if (fields.hero) fields.hero.setEnergy(this.progress()); } }, 0);
 
-      /* ---- PROBLEM : grille fragmentée qui se reconnecte ---- */
+      /* ================= PROBLEM — grille qui se recompose ================= */
       const frags = $$('#fragGrid i');
       frags.forEach((f) => gsap.set(f, { x: gsap.utils.random(-140, 140), y: gsap.utils.random(-120, 120), rotate: gsap.utils.random(-40, 40), opacity: 0 }));
-      gsap.timeline({ scrollTrigger: { trigger: '#probleme', start: 'top top', end: '+=120%', pin: '.problem__pin', scrub: true } })
-        .to(frags, { x: 0, y: 0, rotate: 0, opacity: 0.6, stagger: 0.02, ease: 'power2.out' }, 0)
-        .from('.floatword', { opacity: 0, scale: 0.6, stagger: 0.1 }, 0.1)
-        .from('.problem__list li', { y: 40, opacity: 0, stagger: 0.15, ease: 'power2.out' }, 0.3);
+      if (isDesktop) {
+        gsap.timeline({ scrollTrigger: { trigger: '#probleme', start: 'top top', end: '+=120%', pin: '.problem__pin', scrub: true } })
+          .to(frags, { x: 0, y: 0, rotate: 0, opacity: 0.6, stagger: 0.02, ease: 'power2.out' }, 0)
+          .from('.floatword', { opacity: 0, scale: 0.6, stagger: 0.1 }, 0.1)
+          .from('.problem__list li', { y: 40, opacity: 0, stagger: 0.15, ease: 'power2.out' }, 0.3);
+      } else {
+        gsap.timeline({ scrollTrigger: { trigger: '#probleme', start: 'top 80%', end: 'top 8%', scrub: true } })
+          .to(frags, { x: 0, y: 0, rotate: 0, opacity: 0.5, stagger: 0.015, ease: 'power2.out' }, 0)
+          .from('.floatword', { opacity: 0, scale: 0.6, stagger: 0.08 }, 0);
+        gsap.from('.problem__list li', { scrollTrigger: { trigger: '.problem__list', start: 'top 85%' }, y: 40, opacity: 0, stagger: 0.15, ease: 'power2.out' });
+      }
 
-      /* ---- SOLUTION : plateforme se construit, piliers ---- */
-      gsap.timeline({ scrollTrigger: { trigger: '#solution', start: 'top top', end: '+=120%', pin: '.solution__pin', scrub: true } })
-        .to({}, { onUpdate() { if (fields.sol) fields.sol.setEnergy(this.progress()); } }, 0)
-        .from('.pillar', { y: 60, opacity: 0, stagger: 0.25, ease: 'power3.out' }, 0.1)
-        .from('.pillar__no', { scale: 0.5, opacity: 0, stagger: 0.25 }, 0.15);
+      /* ================= SOLUTION — énergie du réseau + piliers ================= */
+      if (isDesktop) {
+        gsap.timeline({ scrollTrigger: { trigger: '#solution', start: 'top top', end: '+=120%', pin: '.solution__pin', scrub: true } })
+          .to({}, { onUpdate() { if (fields.sol) fields.sol.setEnergy(this.progress()); } }, 0)
+          .from('.pillar', { y: 60, opacity: 0, stagger: 0.25, ease: 'power3.out' }, 0.1)
+          .from('.pillar__no', { scale: 0.5, opacity: 0, stagger: 0.25 }, 0.15);
+      } else {
+        ScrollTrigger.create({ trigger: '#solution', start: 'top 80%', end: 'center 40%', scrub: true,
+          onUpdate: (s) => { if (fields.sol) fields.sol.setEnergy(s.progress); } });
+        gsap.from('.pillar', { scrollTrigger: { trigger: '.pillars', start: 'top 85%' }, y: 50, opacity: 0, stagger: 0.18, ease: 'power3.out' });
+      }
 
-      /* ---- WEB : le navigateur se construit composant par composant ---- */
-      gsap.set('#browser', { rotateX: 8, rotateY: -10, transformPerspective: 1200 });
-      gsap.timeline({ scrollTrigger: { trigger: '#web', start: 'top top', end: '+=160%', pin: '.web__pin', scrub: true } })
-        .from('#browser', { opacity: 0, y: 80, scale: 0.9, ease: 'power2.out' }, 0)
-        .to('#browser', { rotateX: 0, rotateY: 0, ease: 'none' }, 0)
+      /* ================= WEB — le navigateur se construit ================= */
+      gsap.set('#browser', { transformPerspective: 1200 });
+      gsap.timeline({ scrollTrigger: st(
+          { trigger: '#web', start: 'top top', end: '+=160%', pin: '.web__pin', scrub: true },
+          { trigger: '#browser', start: 'top 82%', end: 'bottom 45%', scrub: true }) })
+        .from('#browser', { opacity: 0, y: 60, scale: 0.92, ease: 'power2.out' }, 0)
+        .fromTo('#browser', { rotateX: isDesktop ? 8 : 4, rotateY: isDesktop ? -10 : -5 }, { rotateX: 0, rotateY: 0, ease: 'none' }, 0)
         .to('.bx-nav',   { opacity: 1, ease: 'none' }, 0.15)
-        .to('.bx-hero',  { opacity: 1, ease: 'none' }, 0.3)
-        .to('.bx-cards', { opacity: 1, ease: 'none' }, 0.5)
-        .to('.bx-stats', { opacity: 1, ease: 'none' }, 0.7)
-        .to('#browser',  { scale: 1.06, ease: 'none' }, 0.8);
+        .to('.bx-hero',  { opacity: 1, ease: 'none' }, 0.32)
+        .to('.bx-cards', { opacity: 1, ease: 'none' }, 0.52)
+        .to('.bx-stats', { opacity: 1, ease: 'none' }, 0.72)
+        .to('#browser',  { scale: isDesktop ? 1.06 : 1.02, ease: 'none' }, 0.82);
 
-      /* ---- APPS : le téléphone tourne, les écrans défilent ---- */
+      /* ================= APPS — téléphone qui tourne, écrans qui défilent ================= */
       const screens = $$('#phone .pscreen');
-      gsap.set(screens, { opacity: 0 });
-      gsap.set(screens[0], { opacity: 1 });
-      const appsTl = gsap.timeline({ scrollTrigger: { trigger: '#apps', start: 'top top', end: '+=170%', pin: '.apps__pin', scrub: true } });
-      appsTl.from('#phone', { opacity: 0, y: 60, ease: 'power2.out' }, 0)
-            .to('.phone__frame', { rotateY: 12, ease: 'none' }, 0);
+      gsap.set(screens, { opacity: 0 }); if (screens[0]) gsap.set(screens[0], { opacity: 1 });
+      const appsTl = gsap.timeline({ scrollTrigger: st(
+          { trigger: '#apps', start: 'top top', end: '+=170%', pin: '.apps__pin', scrub: true },
+          { trigger: '#phone', start: 'top 82%', end: 'bottom 40%', scrub: true }) });
+      appsTl.from('#phone', { opacity: 0, y: 50, ease: 'power2.out' }, 0)
+            .fromTo('.phone__frame', { rotateY: isDesktop ? -16 : -8 }, { rotateY: isDesktop ? 12 : 6, ease: 'none' }, 0);
       screens.forEach((sc, i) => {
         if (i === 0) return;
         const at = 0.15 + i * 0.22;
-        appsTl.to(screens[i - 1], { opacity: 0, ease: 'none' }, at)
-              .to(sc, { opacity: 1, ease: 'none' }, at);
+        appsTl.to(screens[i - 1], { opacity: 0, ease: 'none' }, at).to(sc, { opacity: 1, ease: 'none' }, at);
       });
 
-      /* ---- SEO : requête tapée, résultats, "vous" remonte ---- */
+      /* ================= SEO — requête tapée, résultats, "vous" se démarque ================= */
       const results = $$('#serp .serp__item');
       const you = $('#serp .serp__item--you');
       gsap.set(results, { opacity: 0, y: 16 });
-      const seoTl = gsap.timeline({ scrollTrigger: {
-        trigger: '#seo', start: 'top top', end: '+=170%', pin: '.seo__pin', scrub: true,
-        onUpdate: (self) => typeQuery(self.progress),
-      } });
+      const seoTl = gsap.timeline({ scrollTrigger: st(
+          { trigger: '#seo', start: 'top top', end: '+=170%', pin: '.seo__pin', scrub: true, onUpdate: (s) => typeQuery(s.progress) },
+          { trigger: '#serp', start: 'top 82%', end: 'bottom 35%', scrub: true, onUpdate: (s) => typeQuery(s.progress) }) });
       results.forEach((r, i) => seoTl.to(r, { opacity: 1, y: 0, ease: 'none' }, 0.3 + i * 0.08));
-      // "vous" remonte de la 3e place vers le haut
-      seoTl.to(you, { order: 0 }, 0.7)
-           .fromTo(you, { y: 0 }, { y: () => -(you.offsetHeight + 12) * 2, ease: 'power2.inOut' }, 0.78)
-           .to(you, { boxShadow: '0 0 45px -6px rgba(59,118,255,.7)', ease: 'none' }, 0.85);
+      if (isDesktop) {
+        seoTl.fromTo(you, { y: 0 }, { y: () => -(you.offsetHeight + 12) * 2, ease: 'power2.inOut' }, 0.78)
+             .to(you, { boxShadow: '0 0 45px -6px rgba(59,118,255,.7)', ease: 'none' }, 0.85);
+      } else {
+        seoTl.to(you, { scale: 1.03, boxShadow: '0 0 35px -8px rgba(59,118,255,.6)', ease: 'none' }, 0.8);
+      }
 
-      /* ---- PROCESS : scroll horizontal + ligne lumineuse ---- */
-      const track = $('#processTrack');
+      /* ================= PROCESS — horizontal (desktop) / vertical (mobile) ================= */
       const steps = $$('.pstep');
       const line = $('#processLine');
-      const totalX = () => Math.max(0, track.scrollWidth - window.innerWidth + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gutter')) );
-      const procTl = gsap.timeline({ scrollTrigger: {
-        trigger: '#process', start: 'top top', end: () => '+=' + (track.scrollWidth * 0.9),
-        pin: '.process__pin', scrub: true,
-        onUpdate: (self) => {
-          if (line) line.style.width = (self.progress * 100) + '%';
-          const idx = Math.round(self.progress * (steps.length - 1));
-          steps.forEach((s, i) => s.classList.toggle('is-active', i <= idx));
-        },
-      } });
-      procTl.to('.process__steps', { x: () => -totalX(), ease: 'none' });
-    });
-
-    /* -------- MOBILE : storytelling conservé, sans pins lourds -------- */
-    mm.add('(max-width: 900px)', () => {
-      // révélations simples, pas de pin ni scrub coûteux
-      $$('.bx').forEach((b) => b.style.opacity = 1);
-      const first = $('#phone .pscreen[data-ps="0"]'); if (first) first.style.opacity = 1;
-      $$('#serp .serp__item').forEach((r) => { r.style.opacity = 1; r.style.transform = 'none'; });
-      typeQuery(1);
-      $$('.pstep').forEach((s) => s.classList.add('is-active'));
-
-      const groups = ['.pillar', '.problem__list li', '.tagcloud li', '#browser', '#phone', '#serp'];
-      groups.forEach((sel) => $$(sel).forEach((el) => {
-        ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
-          onEnter: () => gsap.fromTo(el, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' }) });
-      }));
+      if (isDesktop) {
+        const track = $('#processTrack');
+        const totalX = () => Math.max(0, track.scrollWidth - window.innerWidth + parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--gutter')));
+        if (line) line.style.height = '';
+        gsap.timeline({ scrollTrigger: {
+          trigger: '#process', start: 'top top', end: () => '+=' + (track.scrollWidth * 0.9), pin: '.process__pin', scrub: true,
+          onUpdate: (s) => {
+            if (line) line.style.width = (s.progress * 100) + '%';
+            const idx = Math.round(s.progress * (steps.length - 1));
+            steps.forEach((el, i) => el.classList.toggle('is-active', i <= idx));
+          },
+        } }).to('.process__steps', { x: () => -totalX(), ease: 'none' });
+      } else {
+        if (line) { line.style.width = '100%'; line.style.height = '0%'; }
+        steps.forEach((step, i) => ScrollTrigger.create({
+          trigger: step, start: 'top 78%',
+          onEnter: () => { step.classList.add('is-active'); if (line) line.style.height = ((i + 1) / steps.length * 100) + '%'; },
+          onLeaveBack: () => { step.classList.remove('is-active'); if (line) line.style.height = (i / steps.length * 100) + '%'; },
+        }));
+      }
     });
   }
 

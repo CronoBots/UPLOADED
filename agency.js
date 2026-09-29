@@ -232,133 +232,107 @@
      loupe + courbe de croissance (SEO). Three.js. Desktop only,
      fallback canvas 2D sinon. Réagit souris + scroll (énergie).
      ========================================================= */
-  // Échantillonne N points le long de "traits" (lignes + arcs) => forme en points
-  function sampleShape(segments, N) {
-    const segLen = (s) => s.type === 'arc'
-      ? s.r * Math.abs(s.a1 - s.a0)
-      : Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]);
-    const segPt = (s, t) => s.type === 'arc'
-      ? [s.c[0] + s.r * Math.cos(s.a0 + (s.a1 - s.a0) * t), s.c[1] + s.r * Math.sin(s.a0 + (s.a1 - s.a0) * t)]
-      : [s.a[0] + (s.b[0] - s.a[0]) * t, s.a[1] + (s.b[1] - s.a[1]) * t];
-    const lens = segments.map(segLen);
-    const total = lens.reduce((a, b) => a + b, 0) || 1;
-    const out = new Float32Array(N * 3);
-    let i = 0;
-    for (let s = 0; s < segments.length; s++) {
-      const cnt = s === segments.length - 1 ? N - i : Math.round(N * lens[s] / total);
-      for (let j = 0; j < cnt && i < N; j++) {
-        const p = segPt(segments[s], Math.min(1, (j + Math.random() * 0.7) / Math.max(1, cnt)));
-        out[i * 3] = p[0] + (Math.random() - 0.5) * 0.07;
-        out[i * 3 + 1] = p[1] + (Math.random() - 0.5) * 0.07;
-        out[i * 3 + 2] = (Math.random() - 0.5) * 0.55;
-        i++;
-      }
+  const HERO_VERT = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+  const HERO_FRAG = `
+    precision highp float;
+    varying vec2 vUv;
+    uniform float uTime; uniform vec2 uRes; uniform vec2 uMouse; uniform float uEnergy;
+    uniform vec3 uBg; uniform vec3 uBlue; uniform vec3 uViolet; uniform vec3 uCyan;
+    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+    vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+    float snoise(vec3 v){
+      const vec2 C=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
+      vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+      vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+      vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy; i=mod289(i);
+      vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+      float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+      vec4 j=p-49.0*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
+      vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
+      vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+      vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
+      vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+      vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+      vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+      vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
+      return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
     }
-    while (i < N) { const p = segPt(segments[0], Math.random()); out[i*3]=p[0]; out[i*3+1]=p[1]; out[i*3+2]=(Math.random()-0.5)*0.55; i++; }
-    return out;
-  }
-  function heroShapeDefs() {
-    const rect = (x0, y0, x1, y1) => ([
-      { type: 'line', a: [x0, y1], b: [x1, y1] }, { type: 'line', a: [x0, y0], b: [x1, y0] },
-      { type: 'line', a: [x0, y0], b: [x0, y1] }, { type: 'line', a: [x1, y0], b: [x1, y1] },
-    ]);
-    const circle = (cx, cy, r) => ({ type: 'arc', c: [cx, cy], r, a0: 0, a1: Math.PI * 2 });
-    // 1) NAVIGATEUR
-    const browser = [
-      ...rect(-3, -2, 3, 2),
-      { type: 'line', a: [-3, 1.3], b: [3, 1.3] },
-      circle(-2.6, 1.65, 0.08), circle(-2.3, 1.65, 0.08), circle(-2.0, 1.65, 0.08),
-      { type: 'line', a: [-1.4, 1.65], b: [1.2, 1.65] },
-      { type: 'line', a: [-2.5, 0.7], b: [2.5, 0.7] },
-      { type: 'line', a: [-2.5, 0.25], b: [1.4, 0.25] },
-      ...rect(-2.5, -1.5, -0.2, -0.3), ...rect(0.2, -1.5, 2.5, -0.3),
-    ];
-    // 2) SMARTPHONE (rectangle arrondi vertical)
-    const phone = [
-      { type: 'line', a: [-0.75, 2.15], b: [0.75, 2.15] }, { type: 'line', a: [-0.75, -2.15], b: [0.75, -2.15] },
-      { type: 'line', a: [-1.15, -1.75], b: [-1.15, 1.75] }, { type: 'line', a: [1.15, -1.75], b: [1.15, 1.75] },
-      { type: 'arc', c: [-0.75, 1.75], r: 0.4, a0: Math.PI / 2, a1: Math.PI },
-      { type: 'arc', c: [0.75, 1.75], r: 0.4, a0: 0, a1: Math.PI / 2 },
-      { type: 'arc', c: [0.75, -1.75], r: 0.4, a0: -Math.PI / 2, a1: 0 },
-      { type: 'arc', c: [-0.75, -1.75], r: 0.4, a0: Math.PI, a1: Math.PI * 1.5 },
-      { type: 'line', a: [-0.32, 1.98], b: [0.32, 1.98] },
-      { type: 'line', a: [-0.8, 0.9], b: [0.8, 0.9] }, { type: 'line', a: [-0.8, 0.45], b: [0.35, 0.45] },
-      { type: 'line', a: [-0.6, -1.5], b: [0.6, -1.5] },
-    ];
-    // 3) LOUPE + BARRES DE CROISSANCE (SEO)
-    const bar = (x, top) => ({ type: 'line', a: [x, -0.2], b: [x, top] });
-    const seo = [
-      circle(-0.4, 0.5, 1.55),
-      { type: 'line', a: [0.7, -0.6], b: [2.1, -2.0] }, { type: 'line', a: [0.9, -0.42], b: [2.3, -1.82] },
-      bar(-1.05, 0.15), bar(-0.65, 0.55), bar(-0.25, 1.0), bar(0.15, 1.45),
-    ];
-    return [browser, phone, seo];
-  }
+    float fbm(vec3 p){ float v=0.0,a=0.5; for(int i=0;i<5;i++){ v+=a*snoise(p); p*=2.03; a*=0.5; } return v; }
+    void main(){
+      vec2 asp = vec2(uRes.x/max(uRes.y,1.0), 1.0);
+      vec2 p = (vUv-0.5)*asp;
+      float t = uTime*0.05;
+      float w1 = fbm(vec3(p*1.3, t));
+      float w2 = fbm(vec3(p*0.9+vec2(5.2,1.3), t*0.7)+w1*0.6);
+      vec2 warp = vec2(w1,w2)*0.55;
+      float fb = fbm(vec3((p+warp)*1.05+vec2(1.7,9.2), t*1.2));
+      float fv = fbm(vec3((p-warp*0.8)*0.95+vec2(-4.0,2.0), t*0.9+10.0));
+      float fc = fbm(vec3((p+warp*1.2)*1.4+vec2(8.0,-3.0), t*1.5+20.0));
+      float b = smoothstep(0.08,0.92,fb*0.5+0.5);
+      float vv = smoothstep(0.20,0.96,fv*0.5+0.5);
+      float c = smoothstep(0.36,1.0,fc*0.5+0.5);
+      vec3 col = uBg;
+      col = mix(col, uBlue,   b*(0.55+uEnergy*0.4));
+      col = mix(col, uViolet, vv*(0.45+uEnergy*0.35));
+      col += uCyan * c * (0.10+uEnergy*0.18);
+      float md = distance(p, (uMouse-0.5)*asp);
+      col += uBlue * smoothstep(0.7,0.0,md) * (0.10+uEnergy*0.14);
+      float vig = smoothstep(1.35,0.15,length(p));
+      col *= mix(0.5,1.0,vig);
+      float g = fract(sin(dot(vUv*uRes, vec2(12.9898,78.233)))*43758.5453);
+      col += (g-0.5)*0.02;
+      gl_FragColor = vec4(col, 1.0);
+    }`;
+
+  /* =========================================================
+     FOND WebGL — DÉGRADÉ LIQUIDE animé (shader Three.js)
+     Couleurs qui coulent, réagit à la souris + au scroll (énergie).
+     Desktop ET mobile. Fallback canvas 2D si WebGL indisponible.
+     ========================================================= */
   function initHero3D() {
     if (prefersReduced || !window.THREE) return null;
-    if (window.matchMedia('(max-width: 900px)').matches) return null;
     const host = $('#heroGL'); if (!host) return null;
     const THREE = window.THREE; let renderer;
-    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+    try { renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' }); }
     catch (e) { return null; }
     if (!renderer) return null;
-    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    const light = window.matchMedia('(max-width: 900px)').matches;
+    renderer.setPixelRatio(Math.min(light ? 1.5 : 2, window.devicePixelRatio || 1));
     let w = host.clientWidth || window.innerWidth, h = host.clientHeight || window.innerHeight;
     renderer.setSize(w, h);
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x05070e, 0.05);
-    const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 120);
-    camera.position.set(0, 0, 8);
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const uniforms = {
+      uTime: { value: 0 }, uRes: { value: new THREE.Vector2(w, h) },
+      uMouse: { value: new THREE.Vector2(0.5, 0.5) }, uEnergy: { value: 0 },
+      uBg: { value: new THREE.Color(0x05070e) },
+      uBlue: { value: new THREE.Color(0x2340ff) },
+      uViolet: { value: new THREE.Color(0x7b34ff) },
+      uCyan: { value: new THREE.Color(0x3fa0ff) },
+    };
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2),
+      new THREE.ShaderMaterial({ uniforms, vertexShader: HERO_VERT, fragmentShader: HERO_FRAG }));
+    scene.add(mesh);
 
-    const N = 4800;
-    const shapes = heroShapeDefs().map((def) => sampleShape(def, N));
-    const cur = Float32Array.from(shapes[0]);            // positions courantes
-    // départ : explosion depuis une sphère aléatoire → converge vers la forme 0
-    for (let k = 0; k < N; k++) {
-      const r = 6 + Math.random() * 4, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
-      cur[k*3] = r*Math.sin(ph)*Math.cos(th); cur[k*3+1] = r*Math.sin(ph)*Math.sin(th); cur[k*3+2] = r*Math.cos(ph);
-    }
-    const colors = new Float32Array(N * 3);
-    const cA = new THREE.Color(0x3b76ff), cB = new THREE.Color(0x8b6bff), tmp = new THREE.Color();
-    for (let k = 0; k < N; k++) { tmp.copy(cA).lerp(cB, k / N); colors[k*3]=tmp.r; colors[k*3+1]=tmp.g; colors[k*3+2]=tmp.b; }
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(cur, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    const mat = new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true,
-      opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
-    const points = new THREE.Points(geo, mat);
-    scene.add(points);
-
-    const pos = geo.attributes.position;
-    let energy = 0, targetE = 0, time = 0, running = false, active = 0;
-    const mouse = { x: 0, y: 0 };
-    window.addEventListener('pointermove', (e) => {
-      mouse.x = e.clientX / window.innerWidth - 0.5; mouse.y = e.clientY / window.innerHeight - 0.5;
-    }, { passive: true });
-    function resize() { w = host.clientWidth; h = host.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+    let energy = 0, target = 0, running = false;
+    const mouse = { x: 0.5, y: 0.5 };
+    window.addEventListener('pointermove', (e) => { mouse.x = e.clientX / window.innerWidth; mouse.y = 1 - e.clientY / window.innerHeight; }, { passive: true });
+    function resize() { w = host.clientWidth; h = host.clientHeight; renderer.setSize(w, h); uniforms.uRes.value.set(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); }
     window.addEventListener('resize', resize, { passive: true });
+    resize();
 
     function frame() {
       if (!running) return;
-      time += 0.01;
-      energy += (targetE - energy) * 0.05;
-      const tgt = shapes[active], arr = pos.array;
-      for (let k = 0; k < N; k++) {
-        const o = k * 3;
-        // morph doux vers la forme active + léger frémissement
-        arr[o]   += (tgt[o]   - arr[o])   * 0.06 + Math.sin(time * 2 + k) * 0.0009;
-        arr[o+1] += (tgt[o+1] - arr[o+1]) * 0.06 + Math.cos(time * 2 + k) * 0.0009;
-        arr[o+2] += (tgt[o+2] - arr[o+2]) * 0.06;
-      }
-      pos.needsUpdate = true;
-      points.rotation.y = mouse.x * 0.5 + Math.sin(time * 0.5) * 0.12 + energy * 0.6;
-      points.rotation.x = mouse.y * 0.28;
-      camera.position.z = 8 - energy * 2.6;
-      camera.position.x += (mouse.x * 1.2 - camera.position.x) * 0.04;
-      camera.lookAt(0, 0, 0);
+      uniforms.uTime.value += 0.016;
+      energy += (target - energy) * 0.05;
+      uniforms.uEnergy.value = energy;
+      uniforms.uMouse.value.x += (mouse.x - uniforms.uMouse.value.x) * 0.05;
+      uniforms.uMouse.value.y += (mouse.y - uniforms.uMouse.value.y) * 0.05;
       renderer.render(scene, camera);
       requestAnimationFrame(frame);
     }
@@ -366,21 +340,7 @@
     io.observe(host);
 
     const c2d = $('#heroCanvas'); if (c2d) c2d.style.display = 'none';
-    return { setEnergy(e) { targetE = clamp(e, 0, 1); }, setShape(i) { active = ((i % shapes.length) + shapes.length) % shapes.length; }, resize };
-  }
-
-  /* Cadence les 3 métiers : synchronise le libellé (#heroNow) et la forme 3D */
-  function startHeroDisplay(hero3d) {
-    const labels = $$('#heroNow li');
-    const setActive = (i) => labels.forEach((li, k) => li.classList.toggle('is-on', k === i));
-    setActive(0);
-    if (prefersReduced) return;
-    let i = 0;
-    setInterval(() => {
-      i = (i + 1) % 3;
-      setActive(i);
-      if (hero3d && hero3d.setShape) hero3d.setShape(i);
-    }, 3400);
+    return { setEnergy(e) { target = clamp(e, 0, 1); }, resize };
   }
 
   /* =========================================================
@@ -855,7 +815,6 @@
     const hero3d = videoOn ? null : initHero3D();
     initFields({ skipHero: videoOn || !!hero3d });
     heroFX = hero3d || { setEnergy: (e) => { if (fields.hero) fields.hero.setEnergy(e); } };
-    startHeroDisplay(hero3d);
     initCursor();
     initMagnetic();
     initNav();

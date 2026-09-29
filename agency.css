@@ -208,9 +208,38 @@ body::after {
   opacity: 0; transition: opacity 1.2s var(--ease); }
 .hero__video.is-on { opacity: .42; }
 
-/* reveal primitive (JS-driven) */
-[data-reveal] { opacity: 0; transform: translateY(26px); }
-.reveal-ready [data-reveal].is-in { opacity: 1; transform: none; transition: opacity .9s var(--ease-out), transform .9s var(--ease-out); }
+/* reveal primitive (JS-driven) — blur → focus premium */
+[data-reveal] { opacity: 0; transform: translateY(26px); filter: blur(9px); }
+.reveal-ready [data-reveal].is-in { opacity: 1; transform: none; filter: blur(0);
+  transition: opacity 1s var(--ease-out), transform 1s var(--ease-out), filter 1s var(--ease-out); }
+
+/* ============================================================
+   CURSEUR CUSTOM (desktop, pointer fin) — signature premium
+   ============================================================ */
+.cursor-dot, .cursor-ring { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+  border-radius: 50%; mix-blend-mode: difference; will-change: transform; }
+.cursor-dot { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; background: #fff; }
+.cursor-ring { width: 38px; height: 38px; margin: -19px 0 0 -19px; border: 1.5px solid rgba(255,255,255,.7);
+  transition: width .32s var(--ease), height .32s var(--ease), margin .32s var(--ease), background .32s, border-color .32s; }
+.cursor-ring.is-hover { width: 66px; height: 66px; margin: -33px 0 0 -33px; border-color: transparent; background: rgba(255,255,255,.16); }
+body.has-cursor, body.has-cursor a, body.has-cursor button,
+body.has-cursor .work-card, body.has-cursor [data-scroll-to], body.has-cursor .rail__list li { cursor: none; }
+body.has-cursor input, body.has-cursor textarea, body.has-cursor select { cursor: auto; }
+
+/* ============================================================
+   MARQUEE — bande de mots-clés défilante (rythme premium)
+   ============================================================ */
+.marquee { overflow: hidden; border-block: 1px solid var(--line); padding-block: 24px;
+  background: rgba(255,255,255,.015); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.marquee__track { display: flex; width: max-content; animation: marquee 34s linear infinite; }
+.marquee:hover .marquee__track { animation-play-state: paused; }
+.marquee__group { display: flex; align-items: center; }
+.marquee__item { display: flex; align-items: center; gap: 2.6rem; padding-right: 2.6rem; white-space: nowrap;
+  font-family: var(--font-display); font-weight: 500; font-size: clamp(1.3rem, 3vw, 2.1rem); color: var(--text-dim); }
+.marquee__item::after { content: "✦"; color: var(--accent); font-size: .55em; opacity: .8; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .marquee__track { animation: none; } }
 
 /* ============================================================
    SECTION 1 — HERO

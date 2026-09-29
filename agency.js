@@ -802,6 +802,48 @@
   function initYear() { $$('.js-year').forEach((el) => el.textContent = new Date().getFullYear()); }
 
   /* =========================================================
+     CURSEUR CUSTOM — point net + anneau qui suit en douceur
+     ========================================================= */
+  function initCursor() {
+    if (prefersReduced || !window.matchMedia('(pointer: fine)').matches || window.matchMedia('(max-width: 900px)').matches) return;
+    const dot = document.createElement('div'); dot.className = 'cursor-dot';
+    const ring = document.createElement('div'); ring.className = 'cursor-ring';
+    document.body.append(dot, ring);
+    document.body.classList.add('has-cursor');
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2, rx = mx, ry = my;
+    window.addEventListener('pointermove', (e) => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px, ${my}px)`;
+    }, { passive: true });
+    const loop = () => { rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+      ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(loop); };
+    loop();
+    const sel = 'a, button, .work-card, [data-scroll-to], input, textarea, select, .rail__list li, .wa-fab';
+    document.addEventListener('pointerover', (e) => { if (e.target.closest && e.target.closest(sel)) ring.classList.add('is-hover'); });
+    document.addEventListener('pointerout', (e) => { if (e.target.closest && e.target.closest(sel)) ring.classList.remove('is-hover'); });
+    // masque le curseur quand il quitte la fenêtre
+    document.addEventListener('mouseleave', () => { dot.style.opacity = ring.style.opacity = '0'; });
+    document.addEventListener('mouseenter', () => { dot.style.opacity = ring.style.opacity = '1'; });
+  }
+
+  /* =========================================================
+     BOUTONS MAGNÉTIQUES — attirés par le curseur
+     ========================================================= */
+  function initMagnetic() {
+    if (prefersReduced || !window.matchMedia('(pointer: fine)').matches) return;
+    const targets = $$('.nav__cta, .hero__actions .btn, .pform__actions .btn, .cta .btn');
+    targets.forEach((el) => {
+      const s = 0.32;
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const x = e.clientX - (r.left + r.width / 2), y = e.clientY - (r.top + r.height / 2);
+        el.style.transform = `translate(${x * s}px, ${y * s}px)`;
+      });
+      el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+    });
+  }
+
+  /* =========================================================
      BOOT
      ========================================================= */
   function boot() {
@@ -814,6 +856,8 @@
     initFields({ skipHero: videoOn || !!hero3d });
     heroFX = hero3d || { setEnergy: (e) => { if (fields.hero) fields.hero.setEnergy(e); } };
     startHeroDisplay(hero3d);
+    initCursor();
+    initMagnetic();
     initNav();
     initRail();
     initReveal();

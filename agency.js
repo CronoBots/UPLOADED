@@ -320,8 +320,24 @@
     scene.add(mesh);
 
     let energy = 0, target = 0, running = false;
-    const mouse = { x: 0.5, y: 0.5 };
-    window.addEventListener('pointermove', (e) => { mouse.x = e.clientX / window.innerWidth; mouse.y = 1 - e.clientY / window.innerHeight; }, { passive: true });
+    const mTarget = { x: 0.5, y: 0.5 };
+    let lastInput = -999;
+    const setInput = (x, y) => { mTarget.x = clamp(x, 0, 1); mTarget.y = clamp(y, 0, 1); lastInput = uniforms.uTime.value; };
+    window.addEventListener('pointermove', (e) => setInput(e.clientX / window.innerWidth, 1 - e.clientY / window.innerHeight), { passive: true });
+    window.addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) setInput(t.clientX / window.innerWidth, 1 - t.clientY / window.innerHeight); }, { passive: true });
+    // MOBILE : le dégradé suit l'inclinaison du téléphone (gyroscope)
+    if (light) {
+      const onTilt = (e) => { if (e.gamma == null && e.beta == null) return;
+        setInput(0.5 + clamp((e.gamma || 0) / 40, -1, 1) * 0.5, 0.5 - clamp(((e.beta || 0) - 45) / 40, -1, 1) * 0.5); };
+      const DOE = window.DeviceOrientationEvent;
+      if (DOE && typeof DOE.requestPermission === 'function') {
+        // iOS : permission requise → demandée quand on touche le hero (contextuel)
+        const heroEl = $('#hero') || document.body;
+        heroEl.addEventListener('touchend', function once() {
+          DOE.requestPermission().then((s) => { if (s === 'granted') window.addEventListener('deviceorientation', onTilt); }).catch(() => {});
+        }, { once: true });
+      } else if (DOE) { window.addEventListener('deviceorientation', onTilt); }
+    }
     function resize() { w = host.clientWidth; h = host.clientHeight; renderer.setSize(w, h); uniforms.uRes.value.set(w * renderer.getPixelRatio(), h * renderer.getPixelRatio()); }
     window.addEventListener('resize', resize, { passive: true });
     resize();
@@ -331,8 +347,14 @@
       uniforms.uTime.value += 0.016;
       energy += (target - energy) * 0.05;
       uniforms.uEnergy.value = energy;
-      uniforms.uMouse.value.x += (mouse.x - uniforms.uMouse.value.x) * 0.05;
-      uniforms.uMouse.value.y += (mouse.y - uniforms.uMouse.value.y) * 0.05;
+      // dérive douce quand pas d'interaction récente → vivant sans y toucher
+      let tx = mTarget.x, ty = mTarget.y;
+      if (uniforms.uTime.value - lastInput > 2.0) {
+        const a = uniforms.uTime.value * 0.25;
+        tx = 0.5 + Math.cos(a) * 0.3; ty = 0.5 + Math.sin(a * 0.8) * 0.24;
+      }
+      uniforms.uMouse.value.x += (tx - uniforms.uMouse.value.x) * 0.045;
+      uniforms.uMouse.value.y += (ty - uniforms.uMouse.value.y) * 0.045;
       renderer.render(scene, camera);
       requestAnimationFrame(frame);
     }

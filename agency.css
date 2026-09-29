@@ -195,6 +195,13 @@ body::after {
    ============================================================ */
 .scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
 
+/* Fond 3D WebGL (Three.js) + fond vidéo optionnel — hero */
+.hero__gl { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.hero__gl canvas { display: block; width: 100% !important; height: 100% !important; }
+.hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+  opacity: 0; transition: opacity 1.2s var(--ease); }
+.hero__video.is-on { opacity: .42; }
+
 /* reveal primitive (JS-driven) */
 [data-reveal] { opacity: 0; transform: translateY(26px); }
 .reveal-ready [data-reveal].is-in { opacity: 1; transform: none; transition: opacity .9s var(--ease-out), transform .9s var(--ease-out); }
@@ -303,6 +310,9 @@ body::after {
 .bx-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
 .bx-stats span { height: 44px; border-radius: 10px;
   background: linear-gradient(180deg, rgba(59,118,255,.18), transparent); border: 1px solid var(--line); }
+/* le "vrai site" qui apparaît une fois le wireframe construit */
+.browser__shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: top center; opacity: 0; z-index: 3; }
 
 /* ============================================================
    SECTION 5 — APPS (phone)
@@ -323,6 +333,9 @@ body::after {
   background: linear-gradient(180deg,#0c1122,#070a14); }
 .pscreen { position: absolute; inset: 0; padding: 34px 16px 20px; display: grid; gap: 12px;
   align-content: start; opacity: 0; }
+/* écrans = vraies captures mobiles des projets */
+.phone__screen .pscreen { padding: 0; display: block; }
+.phone__screen .pscreen img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 .ps-status { display: flex; gap: 6px; }
 .ps-status i { height: 6px; border-radius: 3px; background: var(--surface-2); }
 .ps-status i:first-child { width: 30%; background: var(--accent); }

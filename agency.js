@@ -190,24 +190,134 @@
   }
 
   const fields = [];
-  function initFields() {
+  let heroFX = null; // pilote l'énergie du hero (3D si dispo, sinon canvas 2D)
+  function initFields(opts = {}) {
     if (prefersReduced) return;
     const hero = $('#heroCanvas');
     const sol = $('#solutionCanvas');
     const cta = $('#ctaCanvas');
     const light = window.matchMedia('(max-width: 900px)').matches;
-    if (hero) fields.hero = new ParticleField(hero, { maxCount: light ? 60 : 130, converge: true, color: '120,165,255' });
+    if (hero && !opts.skipHero) fields.hero = new ParticleField(hero, { maxCount: light ? 60 : 130, converge: true, color: '120,165,255' });
     if (sol)  fields.sol  = new ParticleField(sol,  { maxCount: light ? 45 : 90, color: '139,120,255', linkDist: 150 });
     if (cta)  fields.cta  = new ParticleField(cta,  { maxCount: light ? 55 : 120, converge: true, color: '120,165,255' });
 
     // pointeur (glow) sur hero
-    if (hero && fields.hero) {
+    if (hero && fields.hero && !opts.skipHero) {
       window.addEventListener('pointermove', (ev) => {
         const r = hero.getBoundingClientRect();
         fields.hero.mouse.x = ev.clientX - r.left;
         fields.hero.mouse.y = ev.clientY - r.top;
       }, { passive: true });
     }
+  }
+
+  /* =========================================================
+     FOND VIDÉO optionnel — activé si #heroVideo a un data-src
+     (déposez un WebM/MP4 : Coverr, Pexels, Mixkit, Pixabay)
+     ========================================================= */
+  function initHeroVideo() {
+    const v = $('#heroVideo'); if (!v) return false;
+    const src = (v.getAttribute('data-src') || '').trim(); if (!src) return false;
+    v.src = src; v.setAttribute('preload', 'auto');
+    v.addEventListener('canplay', () => v.classList.add('is-on'), { once: true });
+    const p = v.play(); if (p && p.catch) p.catch(() => {});
+    const gl = $('#heroGL'); if (gl) gl.style.display = 'none';
+    const c2d = $('#heroCanvas'); if (c2d) c2d.style.display = 'none';
+    return true;
+  }
+
+  /* =========================================================
+     FOND 3D WebGL — terrain de particules ondulant (Three.js)
+     Réagit à la souris (parallaxe) et au scroll (énergie → caméra).
+     Desktop uniquement ; fallback canvas 2D sinon.
+     ========================================================= */
+  function initHero3D() {
+    if (prefersReduced || !window.THREE) return null;
+    if (window.matchMedia('(max-width: 900px)').matches) return null;
+    const host = $('#heroGL'); if (!host) return null;
+    let THREE = window.THREE, renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    } catch (e) { return null; }
+    if (!renderer) return null;
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    let w = host.clientWidth || window.innerWidth, h = host.clientHeight || window.innerHeight;
+    renderer.setSize(w, h);
+    host.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x05070e, 0.058);
+    const camera = new THREE.PerspectiveCamera(62, w / h, 0.1, 120);
+    camera.position.set(0, 2.6, 9);
+    camera.lookAt(0, -1, -6);
+
+    const COLS = 92, ROWS = 64, GAP = 0.9;
+    const count = COLS * ROWS;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const cA = new THREE.Color(0x3b76ff), cB = new THREE.Color(0x8b6bff);
+    let idx = 0;
+    for (let z = 0; z < ROWS; z++) {
+      for (let x = 0; x < COLS; x++) {
+        positions[idx * 3] = (x - COLS / 2) * GAP;
+        positions[idx * 3 + 1] = 0;
+        positions[idx * 3 + 2] = -z * GAP;
+        const c = cA.clone().lerp(cB, x / COLS);
+        colors[idx * 3] = c.r; colors[idx * 3 + 1] = c.g; colors[idx * 3 + 2] = c.b;
+        idx++;
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const mat = new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true,
+      opacity: 0.92, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+
+    const pos = geo.attributes.position;
+    const baseX = Float32Array.from({ length: count }, (_, k) => positions[k * 3]);
+    const baseZ = Float32Array.from({ length: count }, (_, k) => positions[k * 3 + 2]);
+    let energy = 0, target = 0, time = 0, running = false;
+    const mouse = { x: 0, y: 0 };
+    window.addEventListener('pointermove', (e) => {
+      mouse.x = e.clientX / window.innerWidth - 0.5;
+      mouse.y = e.clientY / window.innerHeight - 0.5;
+    }, { passive: true });
+
+    function resize() {
+      w = host.clientWidth; h = host.clientHeight;
+      renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize, { passive: true });
+
+    function frame() {
+      if (!running) return;
+      time += 0.014;
+      energy += (target - energy) * 0.06;
+      const amp = 0.55 + energy * 1.7;
+      const arr = pos.array;
+      for (let k = 0; k < count; k++) {
+        const bx = baseX[k], bz = baseZ[k];
+        arr[k * 3 + 1] = Math.sin(bx * 0.34 + time) * Math.cos(bz * 0.4 + time * 0.8) * amp
+                       + Math.sin((bx + bz) * 0.2 + time * 1.5) * amp * 0.4;
+      }
+      pos.needsUpdate = true;
+      points.rotation.y = mouse.x * 0.22;
+      camera.position.x += (mouse.x * 2.2 - camera.position.x) * 0.03;
+      camera.position.y += ((2.6 - mouse.y * 1.4) - camera.position.y) * 0.03;
+      camera.position.z = 9 - energy * 3.4;
+      camera.lookAt(0, -1, -6);
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+    const io = new IntersectionObserver((ent) => {
+      running = ent[0].isIntersecting; if (running) frame();
+    }, { threshold: 0.01 });
+    io.observe(host);
+
+    const c2d = $('#heroCanvas'); if (c2d) c2d.style.display = 'none';
+    return { setEnergy(e) { target = clamp(e, 0, 1); }, resize };
   }
 
   /* =========================================================
@@ -336,7 +446,7 @@
       gsap.timeline({ scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=110%', pin: '.hero__pin', scrub: true } })
         .to('.hero__content', { scale: isDesktop ? 1.12 : 1.06, y: -40, opacity: 0, ease: 'none' }, 0)
         .to('.hero__scroll', { opacity: 0, ease: 'none' }, 0)
-        .to({}, { onUpdate() { if (fields.hero) fields.hero.setEnergy(this.progress()); } }, 0);
+        .to({}, { onUpdate() { if (heroFX) heroFX.setEnergy(this.progress()); } }, 0);
 
       /* ================= PROBLEM — grille qui se recompose ================= */
       const frags = $$('#fragGrid i');
@@ -376,6 +486,7 @@
         .to('.bx-hero',  { opacity: 1, ease: 'none' }, 0.32)
         .to('.bx-cards', { opacity: 1, ease: 'none' }, 0.52)
         .to('.bx-stats', { opacity: 1, ease: 'none' }, 0.72)
+        .to('.browser__shot', { opacity: 1, ease: 'power1.out' }, 0.82)
         .to('#browser',  { scale: isDesktop ? 1.06 : 1.02, ease: 'none' }, 0.82);
 
       /* ================= APPS — téléphone qui tourne, écrans qui défilent ================= */
@@ -608,7 +719,11 @@
     initYear();
     initFragments();
     initScroll();
-    initFields();
+    // Fond du hero : vidéo (si data-src) → sinon 3D WebGL → sinon canvas 2D
+    const videoOn = initHeroVideo();
+    const hero3d = videoOn ? null : initHero3D();
+    initFields({ skipHero: videoOn || !!hero3d });
+    heroFX = hero3d || { setEnergy: (e) => { if (fields.hero) fields.hero.setEnergy(e); } };
     initNav();
     initRail();
     initReveal();

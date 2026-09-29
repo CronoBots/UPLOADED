@@ -185,6 +185,10 @@
     <!-- ==================================================== -->
     <section class="hero" id="hero" data-scene="hero" aria-label="Introduction">
       <div class="hero__pin">
+        <!-- Fond vidéo optionnel : déposez un fichier (WebM/MP4) puis renseignez data-src.
+             Banques recommandées : Coverr · Pexels · Mixkit · Pixabay (libres, usage commercial). -->
+        <video class="hero__video" id="heroVideo" muted loop playsinline preload="none" aria-hidden="true" data-src=""></video>
+        <div class="hero__gl" id="heroGL" aria-hidden="true"></div>
         <canvas class="scene-canvas" id="heroCanvas" aria-hidden="true"></canvas>
         <div class="hero__veil" aria-hidden="true"></div>
 
@@ -310,6 +314,7 @@
               <div class="bx bx-hero"><b></b><i></i></div>
               <div class="bx bx-cards"><span></span><span></span><span></span></div>
               <div class="bx bx-stats"><span></span><span></span><span></span></div>
+              <img class="browser__shot" src="img/pizzapino-desktop.webp" alt="Site Pizza Pino conçu par Uploaded" loading="lazy" decoding="async" />
             </div>
           </div>
         </div>
@@ -326,26 +331,10 @@
             <div class="phone__frame">
               <span class="phone__notch"></span>
               <div class="phone__screen">
-                <div class="pscreen" data-ps="0">
-                  <div class="ps-status"><i></i><i></i></div>
-                  <div class="ps-hero"></div>
-                  <div class="ps-row"></div><div class="ps-row short"></div>
-                  <div class="ps-cta"></div>
-                </div>
-                <div class="pscreen" data-ps="1">
-                  <div class="ps-notif"><b></b><span></span></div>
-                  <div class="ps-notif"><b></b><span></span></div>
-                  <div class="ps-notif"><b></b><span></span></div>
-                </div>
-                <div class="pscreen" data-ps="2">
-                  <div class="ps-chart"><i style="--h:38%"></i><i style="--h:64%"></i><i style="--h:48%"></i><i style="--h:82%"></i><i style="--h:70%"></i></div>
-                  <div class="ps-row"></div><div class="ps-row short"></div>
-                </div>
-                <div class="pscreen" data-ps="3">
-                  <div class="ps-avatar"></div>
-                  <div class="ps-row center"></div><div class="ps-row center short"></div>
-                  <div class="ps-pay"></div>
-                </div>
+                <div class="pscreen" data-ps="0"><img src="img/pizzapino-mobile.webp" alt="Version mobile du site Pizza Pino" loading="lazy" decoding="async" /></div>
+                <div class="pscreen" data-ps="1"><img src="img/cryptonauts-mobile.webp" alt="Version mobile du site Cryptonauts" loading="lazy" decoding="async" /></div>
+                <div class="pscreen" data-ps="2"><img src="img/jaydenmusic-mobile.webp" alt="Version mobile du site Jayden Music" loading="lazy" decoding="async" /></div>
+                <div class="pscreen" data-ps="3"><img src="img/yumea-mobile.webp" alt="Version mobile du site Yumea" loading="lazy" decoding="async" /></div>
               </div>
             </div>
             <div class="phone__glow"></div>
@@ -624,6 +613,7 @@
   <script src="vendor/gsap.min.js" defer></script>
   <script src="vendor/ScrollTrigger.min.js" defer></script>
   <script src="vendor/lenis.min.js" defer></script>
+  <script src="vendor/three.min.js" defer></script>
   <script src="agency.js" defer></script>
 </body>
 </html>

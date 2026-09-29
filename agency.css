@@ -213,7 +213,9 @@ body::after {
 .hero__pin { position: relative; height: 100vh; min-height: 620px; overflow: hidden;
   display: grid; place-items: center; }
 .hero__veil { position: absolute; inset: 0; z-index: 1;
-  background: radial-gradient(70% 60% at 50% 60%, transparent, var(--bg) 92%); }
+  background:
+    radial-gradient(58% 42% at 50% 42%, rgba(5,7,14,.62), transparent 62%),
+    radial-gradient(75% 65% at 50% 60%, transparent, var(--bg) 94%); }
 .hero__content { position: relative; z-index: 2; text-align: center; }
 .hero__eyebrow { margin-bottom: 1.6rem; }
 .hero__title { font-family: var(--font-display); font-weight: 500; letter-spacing: -.025em;
@@ -230,6 +232,17 @@ body::after {
   font-size: .62rem; letter-spacing: .28em; color: var(--text-mute); }
 .hero__scroll-arrow { animation: bob 1.8s var(--ease) infinite; font-size: 1rem; color: var(--accent-hi); }
 @keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(6px);} }
+
+/* libellé des 3 métiers, synchronisé avec la forme 3D */
+.hero__now { position: absolute; bottom: 78px; left: 50%; transform: translateX(-50%); z-index: 3;
+  display: flex; gap: 10px; list-style: none; padding: 0; margin: 0; flex-wrap: wrap; justify-content: center; }
+.hero__now li { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em;
+  padding: 6px 14px; border-radius: 100px; border: 1px solid var(--line);
+  color: var(--text-mute); background: rgba(255,255,255,.02);
+  transition: color .5s var(--ease), border-color .5s var(--ease), background .5s var(--ease), box-shadow .5s var(--ease); }
+.hero__now li.is-on { color: #fff; border-color: var(--accent);
+  background: linear-gradient(100deg, rgba(59,118,255,.18), rgba(139,107,255,.18));
+  box-shadow: 0 0 24px -6px var(--glow); }
 
 /* ============================================================
    SECTION 2 — PROBLEM
@@ -598,6 +611,7 @@ body::after {
   .colophon__legal { flex-direction: column; align-items: flex-start; }
   .hero__actions { flex-direction: column; }
   .hero__actions .btn { width: 100%; justify-content: center; }
+  .hero__now { display: none; }
   .phone__frame { transform: none; }
 }
 

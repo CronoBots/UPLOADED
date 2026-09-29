@@ -227,18 +227,80 @@
   }
 
   /* =========================================================
-     FOND 3D WebGL — terrain de particules ondulant (Three.js)
-     Réagit à la souris (parallaxe) et au scroll (énergie → caméra).
-     Desktop uniquement ; fallback canvas 2D sinon.
+     FOND 3D WebGL — nuage de particules qui se TRANSFORME entre
+     les 3 métiers : navigateur (web) → smartphone (apps) →
+     loupe + courbe de croissance (SEO). Three.js. Desktop only,
+     fallback canvas 2D sinon. Réagit souris + scroll (énergie).
      ========================================================= */
+  // Échantillonne N points le long de "traits" (lignes + arcs) => forme en points
+  function sampleShape(segments, N) {
+    const segLen = (s) => s.type === 'arc'
+      ? s.r * Math.abs(s.a1 - s.a0)
+      : Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]);
+    const segPt = (s, t) => s.type === 'arc'
+      ? [s.c[0] + s.r * Math.cos(s.a0 + (s.a1 - s.a0) * t), s.c[1] + s.r * Math.sin(s.a0 + (s.a1 - s.a0) * t)]
+      : [s.a[0] + (s.b[0] - s.a[0]) * t, s.a[1] + (s.b[1] - s.a[1]) * t];
+    const lens = segments.map(segLen);
+    const total = lens.reduce((a, b) => a + b, 0) || 1;
+    const out = new Float32Array(N * 3);
+    let i = 0;
+    for (let s = 0; s < segments.length; s++) {
+      const cnt = s === segments.length - 1 ? N - i : Math.round(N * lens[s] / total);
+      for (let j = 0; j < cnt && i < N; j++) {
+        const p = segPt(segments[s], Math.min(1, (j + Math.random() * 0.7) / Math.max(1, cnt)));
+        out[i * 3] = p[0] + (Math.random() - 0.5) * 0.07;
+        out[i * 3 + 1] = p[1] + (Math.random() - 0.5) * 0.07;
+        out[i * 3 + 2] = (Math.random() - 0.5) * 0.55;
+        i++;
+      }
+    }
+    while (i < N) { const p = segPt(segments[0], Math.random()); out[i*3]=p[0]; out[i*3+1]=p[1]; out[i*3+2]=(Math.random()-0.5)*0.55; i++; }
+    return out;
+  }
+  function heroShapeDefs() {
+    const rect = (x0, y0, x1, y1) => ([
+      { type: 'line', a: [x0, y1], b: [x1, y1] }, { type: 'line', a: [x0, y0], b: [x1, y0] },
+      { type: 'line', a: [x0, y0], b: [x0, y1] }, { type: 'line', a: [x1, y0], b: [x1, y1] },
+    ]);
+    const circle = (cx, cy, r) => ({ type: 'arc', c: [cx, cy], r, a0: 0, a1: Math.PI * 2 });
+    // 1) NAVIGATEUR
+    const browser = [
+      ...rect(-3, -2, 3, 2),
+      { type: 'line', a: [-3, 1.3], b: [3, 1.3] },
+      circle(-2.6, 1.65, 0.08), circle(-2.3, 1.65, 0.08), circle(-2.0, 1.65, 0.08),
+      { type: 'line', a: [-1.4, 1.65], b: [1.2, 1.65] },
+      { type: 'line', a: [-2.5, 0.7], b: [2.5, 0.7] },
+      { type: 'line', a: [-2.5, 0.25], b: [1.4, 0.25] },
+      ...rect(-2.5, -1.5, -0.2, -0.3), ...rect(0.2, -1.5, 2.5, -0.3),
+    ];
+    // 2) SMARTPHONE (rectangle arrondi vertical)
+    const phone = [
+      { type: 'line', a: [-0.75, 2.15], b: [0.75, 2.15] }, { type: 'line', a: [-0.75, -2.15], b: [0.75, -2.15] },
+      { type: 'line', a: [-1.15, -1.75], b: [-1.15, 1.75] }, { type: 'line', a: [1.15, -1.75], b: [1.15, 1.75] },
+      { type: 'arc', c: [-0.75, 1.75], r: 0.4, a0: Math.PI / 2, a1: Math.PI },
+      { type: 'arc', c: [0.75, 1.75], r: 0.4, a0: 0, a1: Math.PI / 2 },
+      { type: 'arc', c: [0.75, -1.75], r: 0.4, a0: -Math.PI / 2, a1: 0 },
+      { type: 'arc', c: [-0.75, -1.75], r: 0.4, a0: Math.PI, a1: Math.PI * 1.5 },
+      { type: 'line', a: [-0.32, 1.98], b: [0.32, 1.98] },
+      { type: 'line', a: [-0.8, 0.9], b: [0.8, 0.9] }, { type: 'line', a: [-0.8, 0.45], b: [0.35, 0.45] },
+      { type: 'line', a: [-0.6, -1.5], b: [0.6, -1.5] },
+    ];
+    // 3) LOUPE + BARRES DE CROISSANCE (SEO)
+    const bar = (x, top) => ({ type: 'line', a: [x, -0.2], b: [x, top] });
+    const seo = [
+      circle(-0.4, 0.5, 1.55),
+      { type: 'line', a: [0.7, -0.6], b: [2.1, -2.0] }, { type: 'line', a: [0.9, -0.42], b: [2.3, -1.82] },
+      bar(-1.05, 0.15), bar(-0.65, 0.55), bar(-0.25, 1.0), bar(0.15, 1.45),
+    ];
+    return [browser, phone, seo];
+  }
   function initHero3D() {
     if (prefersReduced || !window.THREE) return null;
     if (window.matchMedia('(max-width: 900px)').matches) return null;
     const host = $('#heroGL'); if (!host) return null;
-    let THREE = window.THREE, renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    } catch (e) { return null; }
+    const THREE = window.THREE; let renderer;
+    try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+    catch (e) { return null; }
     if (!renderer) return null;
     renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     let w = host.clientWidth || window.innerWidth, h = host.clientHeight || window.innerHeight;
@@ -246,78 +308,79 @@
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x05070e, 0.058);
-    const camera = new THREE.PerspectiveCamera(62, w / h, 0.1, 120);
-    camera.position.set(0, 2.6, 9);
-    camera.lookAt(0, -1, -6);
+    scene.fog = new THREE.FogExp2(0x05070e, 0.05);
+    const camera = new THREE.PerspectiveCamera(55, w / h, 0.1, 120);
+    camera.position.set(0, 0, 8);
 
-    const COLS = 92, ROWS = 64, GAP = 0.9;
-    const count = COLS * ROWS;
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    const cA = new THREE.Color(0x3b76ff), cB = new THREE.Color(0x8b6bff);
-    let idx = 0;
-    for (let z = 0; z < ROWS; z++) {
-      for (let x = 0; x < COLS; x++) {
-        positions[idx * 3] = (x - COLS / 2) * GAP;
-        positions[idx * 3 + 1] = 0;
-        positions[idx * 3 + 2] = -z * GAP;
-        const c = cA.clone().lerp(cB, x / COLS);
-        colors[idx * 3] = c.r; colors[idx * 3 + 1] = c.g; colors[idx * 3 + 2] = c.b;
-        idx++;
-      }
+    const N = 4800;
+    const shapes = heroShapeDefs().map((def) => sampleShape(def, N));
+    const cur = Float32Array.from(shapes[0]);            // positions courantes
+    // départ : explosion depuis une sphère aléatoire → converge vers la forme 0
+    for (let k = 0; k < N; k++) {
+      const r = 6 + Math.random() * 4, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+      cur[k*3] = r*Math.sin(ph)*Math.cos(th); cur[k*3+1] = r*Math.sin(ph)*Math.sin(th); cur[k*3+2] = r*Math.cos(ph);
     }
+    const colors = new Float32Array(N * 3);
+    const cA = new THREE.Color(0x3b76ff), cB = new THREE.Color(0x8b6bff), tmp = new THREE.Color();
+    for (let k = 0; k < N; k++) { tmp.copy(cA).lerp(cB, k / N); colors[k*3]=tmp.r; colors[k*3+1]=tmp.g; colors[k*3+2]=tmp.b; }
+
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('position', new THREE.BufferAttribute(cur, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    const mat = new THREE.PointsMaterial({ size: 0.06, vertexColors: true, transparent: true,
-      opacity: 0.92, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+    const mat = new THREE.PointsMaterial({ size: 0.05, vertexColors: true, transparent: true,
+      opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
     const points = new THREE.Points(geo, mat);
     scene.add(points);
 
     const pos = geo.attributes.position;
-    const baseX = Float32Array.from({ length: count }, (_, k) => positions[k * 3]);
-    const baseZ = Float32Array.from({ length: count }, (_, k) => positions[k * 3 + 2]);
-    let energy = 0, target = 0, time = 0, running = false;
+    let energy = 0, targetE = 0, time = 0, running = false, active = 0;
     const mouse = { x: 0, y: 0 };
     window.addEventListener('pointermove', (e) => {
-      mouse.x = e.clientX / window.innerWidth - 0.5;
-      mouse.y = e.clientY / window.innerHeight - 0.5;
+      mouse.x = e.clientX / window.innerWidth - 0.5; mouse.y = e.clientY / window.innerHeight - 0.5;
     }, { passive: true });
-
-    function resize() {
-      w = host.clientWidth; h = host.clientHeight;
-      renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
-    }
+    function resize() { w = host.clientWidth; h = host.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
     window.addEventListener('resize', resize, { passive: true });
 
     function frame() {
       if (!running) return;
-      time += 0.014;
-      energy += (target - energy) * 0.06;
-      const amp = 0.55 + energy * 1.7;
-      const arr = pos.array;
-      for (let k = 0; k < count; k++) {
-        const bx = baseX[k], bz = baseZ[k];
-        arr[k * 3 + 1] = Math.sin(bx * 0.34 + time) * Math.cos(bz * 0.4 + time * 0.8) * amp
-                       + Math.sin((bx + bz) * 0.2 + time * 1.5) * amp * 0.4;
+      time += 0.01;
+      energy += (targetE - energy) * 0.05;
+      const tgt = shapes[active], arr = pos.array;
+      for (let k = 0; k < N; k++) {
+        const o = k * 3;
+        // morph doux vers la forme active + léger frémissement
+        arr[o]   += (tgt[o]   - arr[o])   * 0.06 + Math.sin(time * 2 + k) * 0.0009;
+        arr[o+1] += (tgt[o+1] - arr[o+1]) * 0.06 + Math.cos(time * 2 + k) * 0.0009;
+        arr[o+2] += (tgt[o+2] - arr[o+2]) * 0.06;
       }
       pos.needsUpdate = true;
-      points.rotation.y = mouse.x * 0.22;
-      camera.position.x += (mouse.x * 2.2 - camera.position.x) * 0.03;
-      camera.position.y += ((2.6 - mouse.y * 1.4) - camera.position.y) * 0.03;
-      camera.position.z = 9 - energy * 3.4;
-      camera.lookAt(0, -1, -6);
+      points.rotation.y = mouse.x * 0.5 + Math.sin(time * 0.5) * 0.12 + energy * 0.6;
+      points.rotation.x = mouse.y * 0.28;
+      camera.position.z = 8 - energy * 2.6;
+      camera.position.x += (mouse.x * 1.2 - camera.position.x) * 0.04;
+      camera.lookAt(0, 0, 0);
       renderer.render(scene, camera);
       requestAnimationFrame(frame);
     }
-    const io = new IntersectionObserver((ent) => {
-      running = ent[0].isIntersecting; if (running) frame();
-    }, { threshold: 0.01 });
+    const io = new IntersectionObserver((ent) => { running = ent[0].isIntersecting; if (running) frame(); }, { threshold: 0.01 });
     io.observe(host);
 
     const c2d = $('#heroCanvas'); if (c2d) c2d.style.display = 'none';
-    return { setEnergy(e) { target = clamp(e, 0, 1); }, resize };
+    return { setEnergy(e) { targetE = clamp(e, 0, 1); }, setShape(i) { active = ((i % shapes.length) + shapes.length) % shapes.length; }, resize };
+  }
+
+  /* Cadence les 3 métiers : synchronise le libellé (#heroNow) et la forme 3D */
+  function startHeroDisplay(hero3d) {
+    const labels = $$('#heroNow li');
+    const setActive = (i) => labels.forEach((li, k) => li.classList.toggle('is-on', k === i));
+    setActive(0);
+    if (prefersReduced) return;
+    let i = 0;
+    setInterval(() => {
+      i = (i + 1) % 3;
+      setActive(i);
+      if (hero3d && hero3d.setShape) hero3d.setShape(i);
+    }, 3400);
   }
 
   /* =========================================================
@@ -724,6 +787,7 @@
     const hero3d = videoOn ? null : initHero3D();
     initFields({ skipHero: videoOn || !!hero3d });
     heroFX = hero3d || { setEnergy: (e) => { if (fields.hero) fields.hero.setEnergy(e); } };
+    startHeroDisplay(hero3d);
     initNav();
     initRail();
     initReveal();

@@ -15,8 +15,8 @@
   --line-2:    rgba(140,165,255,.22);
 
   --text:      #EAECF4;
-  --text-dim:  #9BA3B9;
-  --text-mute: #656C82;
+  --text-dim:  #A2AABE;
+  --text-mute: #7E869C;
 
   --accent:    #3B76FF;   /* bleu électrique */
   --accent-hi: #6AA0FF;
@@ -55,6 +55,12 @@ img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; }
 ::selection { background: var(--accent); color: #fff; }
+
+/* Accessibilité : focus visible clavier + cibles d'ancre sous la navbar fixe */
+:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 3px; border-radius: 6px; }
+.btn:focus-visible, .work-card:focus-visible, .nav__brand:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 4px; }
+:focus:not(:focus-visible) { outline: none; }
+section[id], main [id] { scroll-margin-top: calc(var(--nav-h) + 14px); }
 
 /* ambient background wash */
 body::before {
@@ -420,6 +426,31 @@ body::after {
 .pstep__no { font-family: var(--font-mono); font-size: 2rem; color: var(--accent-hi); font-weight: 300; }
 .pstep h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; margin: .5rem 0 .5rem; }
 .pstep p { color: var(--text-dim); font-size: .94rem; }
+
+/* ============================================================
+   HERO SCRUB — séquence cinématique pilotée par le scroll
+   Une carte projet grandit jusqu'au plein écran, enchaîne
+   les vrais projets, puis se referme. (inspiré de "Hero Scrub")
+   ============================================================ */
+.reel { position: relative; }
+.reel__pin { position: relative; height: 100vh; overflow: hidden; display: grid; place-items: center; }
+.reel__head { position: absolute; z-index: 4; top: 14%; left: 50%; transform: translateX(-50%);
+  width: 100%; text-align: center; pointer-events: none; padding-inline: var(--gutter); }
+.reel__head .section-title { margin-top: .3rem; }
+.reel__stage { position: relative; width: min(80vw, 900px); aspect-ratio: 16 / 9; border-radius: 20px;
+  overflow: hidden; will-change: transform; transform-origin: center center;
+  box-shadow: 0 50px 130px -40px rgba(0,0,0,.9), 0 0 60px -20px var(--glow); z-index: 2; }
+.reel__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; opacity: 0; }
+.reel__img[data-r="0"] { opacity: 1; }
+.reel__frame { position: absolute; inset: 0; z-index: 2; border-radius: 20px; pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--line-2); }
+.reel__names { position: absolute; z-index: 5; bottom: 9%; left: 0; right: 0; margin: 0; padding: 0 var(--gutter);
+  list-style: none; text-align: center; pointer-events: none; }
+.reel__names li { display: none; font-family: var(--font-display); font-weight: 600; letter-spacing: -.01em;
+  font-size: clamp(1.6rem, 5vw, 3.4rem); color: #fff; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+.reel__names li.is-on { display: block; }
+.reel__names li span { font-family: var(--font-mono); font-weight: 400; display: block; font-size: .8rem;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent-hi); margin-top: .5rem; }
 
 /* ============================================================
    SECTION 8 — WORKS

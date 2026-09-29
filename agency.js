@@ -404,8 +404,9 @@
   function scrollTo(target) {
     const el = typeof target === 'string' ? $(target) : target;
     if (!el) return;
-    if (lenis) lenis.scrollTo(el, { offset: 0, duration: 1.2 });
-    else el.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth' });
+    const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 76;
+    if (lenis) lenis.scrollTo(el, { offset: -navH, duration: 1.2 });
+    else { const y = el.getBoundingClientRect().top + window.scrollY - navH; window.scrollTo({ top: y, behavior: prefersReduced ? 'auto' : 'smooth' }); }
   }
 
   /* =========================================================
@@ -603,6 +604,31 @@
           onEnter: () => { step.classList.add('is-active'); if (line) line.style.height = ((i + 1) / steps.length * 100) + '%'; },
           onLeaveBack: () => { step.classList.remove('is-active'); if (line) line.style.height = (i / steps.length * 100) + '%'; },
         }));
+      }
+
+      /* ================= HERO SCRUB — carte projet qui grandit en plein écran ================= */
+      const reelStage = $('#reelStage');
+      if (reelStage) {
+        const reelNames = $$('#reelNames li');
+        // offsetWidth/Height = taille CSS sans transform → base fiable pour le scale
+        const coverScale = () => {
+          const bw = reelStage.offsetWidth || 1, bh = reelStage.offsetHeight || 1;
+          const fx = window.innerWidth / bw, fy = window.innerHeight / bh;
+          return (isDesktop ? Math.max(fx, fy) : fx) * 1.06;
+        };
+        const setName = (i) => reelNames.forEach((n, k) => n.classList.toggle('is-on', k === i));
+        gsap.set(reelStage, { scale: 0.46 });
+        gsap.timeline({ scrollTrigger: {
+          trigger: '#reel', start: 'top top', end: '+=220%', pin: '.reel__pin', scrub: true,
+          onUpdate: (s) => setName(s.progress < 0.5 ? 0 : s.progress < 0.72 ? 1 : 2),
+        } })
+          .to('#reelHead', { opacity: 0, y: -30, ease: 'none' }, 0)
+          .to(reelStage, { scale: coverScale, ease: 'none' }, 0)
+          .to('.reel__img[data-r="0"]', { opacity: 0, ease: 'none' }, 0.46)
+          .to('.reel__img[data-r="1"]', { opacity: 1, ease: 'none' }, 0.46)
+          .to('.reel__img[data-r="1"]', { opacity: 0, ease: 'none' }, 0.68)
+          .to('.reel__img[data-r="2"]', { opacity: 1, ease: 'none' }, 0.68)
+          .to(reelStage, { scale: () => coverScale() * 0.62, ease: 'none' }, 0.9);
       }
     });
   }

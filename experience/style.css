@@ -1,0 +1,233 @@
+/* =====================================================================
+   uploaded.be — expérience « film piloté par le scroll »
+   Palette et polices reprises du site (bleu du logo #4884D8, bleu nuit).
+   ===================================================================== */
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/fonts/bricolage-grotesque-latin.woff2") format("woff2");
+  font-weight: 200 800; font-display: swap;
+}
+@font-face {
+  font-family: "Libre Franklin";
+  src: url("/fonts/libre-franklin-latin.woff2") format("woff2");
+  font-weight: 100 900; font-display: swap;
+}
+@font-face {
+  font-family: "Spline Sans Mono";
+  src: url("/fonts/spline-sans-mono-latin.woff2") format("woff2");
+  font-weight: 300 700; font-display: swap;
+}
+
+:root {
+  --bg: #05070C;
+  --ink: #EAEEF6;
+  --ink-soft: #96A2B8;
+  --blue: #4884D8;
+  --blue-light: #A9C8F5;
+  --f-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --f-body: "Libre Franklin", system-ui, sans-serif;
+  --f-mono: "Spline Sans Mono", ui-monospace, monospace;
+  --pad: clamp(1.25rem, 5vw, 4.5rem);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --p: 0;                       /* progression du film, écrite par script.js */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); color-scheme: dark; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 1rem; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+
+/* ---------------------------------------------------------------------
+   Le film : une section haute, et une scène épinglée par ScrollTrigger.
+   La hauteur réelle de défilement est ajoutée par le pin (pinSpacing) ;
+   ici, .film fait juste un écran.
+   --------------------------------------------------------------------- */
+.film { position: relative; height: 100vh; height: 100svh; }
+.stage {
+  position: relative; height: 100vh; height: 100svh; width: 100%;
+  overflow: hidden; isolation: isolate;
+}
+
+/* Vidéo plein écran. Le léger zoom est appliqué sur .media par GSAP,
+   uniquement en transform (aucun repaint, pas de lag). */
+.media { position: absolute; inset: 0; z-index: -1; will-change: transform; }
+.video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; background: var(--bg);
+  pointer-events: none;
+}
+/* Assombrit les bords et le bas pour que le texte reste lisible */
+.veil {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgba(5,7,12,.75) 100%),
+    linear-gradient(180deg, rgba(5,7,12,.35) 0%, transparent 25%, transparent 70%, rgba(5,7,12,.55) 100%);
+}
+
+/* Pendant STORY et FEATURE, un léger voile central renforce le contraste des textes */
+.media::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(55% 45% at 50% 50%, rgba(5,7,12,.55), transparent 75%);
+  opacity: clamp(0, (var(--p) - .12) * 8, 1);
+}
+.is-final .media::after { opacity: 0; transition: opacity .6s var(--ease); }
+
+/* Repli si la vidéo ne charge pas : halo bleu qui grandit avec le scroll */
+.fallback {
+  position: absolute; inset: 0; opacity: 0; transition: opacity .8s var(--ease);
+  background:
+    radial-gradient(calc(28% + var(--p) * 30%) calc(22% + var(--p) * 24%) at 50% 52%,
+      rgba(72,132,216,calc(.18 + var(--p) * .3)), transparent 70%),
+    radial-gradient(60% 50% at 50% 50%, #0E1830 0%, var(--bg) 70%);
+}
+.no-video .video { display: none; }
+.no-video .fallback { opacity: 1; }
+
+/* ---------------------------------------------------------------------
+   Chapitres : calques superposés, pilotés par la timeline GSAP.
+   Ils démarrent invisibles ; GSAP les fait entrer et sortir.
+   --------------------------------------------------------------------- */
+.chapter {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  padding: var(--pad); text-align: center; pointer-events: none;
+}
+.chapter > * { will-change: transform, opacity; }
+
+/* SECTION 1 — HERO */
+.hero-title {
+  font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(3.2rem, 12.5vw, 12.5rem);
+  line-height: .9; letter-spacing: -.055em; text-transform: uppercase;
+}
+/* Dégradé posé sur chaque ligne (et non sur le titre) : une ligne animée
+   en transform garde son texte visible dans tous les navigateurs. */
+.hero-title .line {
+  display: block; padding-bottom: .04em;
+  background: linear-gradient(180deg, #FFFFFF 35%, var(--blue-light) 110%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.chapter--hero { grid-template-rows: 1fr auto; padding-top: 18vh; }
+.hero-sub {
+  display: grid; justify-items: center; gap: 1rem; padding-bottom: 6vh;
+  font-family: var(--f-mono); font-size: .76rem; letter-spacing: .32em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+.hero-cue { position: relative; width: 1px; height: 54px; background: rgba(234,238,246,.15); overflow: hidden; }
+.hero-cue::after {
+  content: ""; position: absolute; left: 0; width: 1px; height: 40%;
+  background: var(--blue-light); animation: cue 2.2s var(--ease) infinite;
+}
+@keyframes cue { 0% { top: -40%; } 70%, 100% { top: 110%; } }
+
+/* SECTION 2 — STORY : trois phrases au même endroit, l'une après l'autre */
+.chapter--story { display: grid; }
+.story-line {
+  grid-area: 1 / 1; opacity: 0;
+  text-shadow: 0 2px 30px rgba(5,7,12,.85), 0 0 80px rgba(5,7,12,.9);
+  font-family: var(--f-display); font-weight: 600;
+  font-size: clamp(2.1rem, 6.6vw, 6.4rem);
+  line-height: 1; letter-spacing: -.045em; max-width: 14ch;
+}
+
+/* SECTION 3 — FEATURE : trois caractéristiques autour de la vidéo */
+.chapter--feature { display: block; }
+.feature {
+  position: absolute; width: min(300px, 30vw); text-align: left; opacity: 0;
+}
+.feature--a { left: var(--pad); top: 22%; }
+.feature--b { right: var(--pad); top: 40%; text-align: right; }
+.feature--c { left: 50%; bottom: 12%; margin-left: calc(min(300px, 30vw) / -2); text-align: center; }
+.feature-n { font-family: var(--f-mono); font-size: .74rem; letter-spacing: .2em; color: var(--blue); }
+.feature h2 {
+  margin: .5rem 0 .55rem; font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(1.4rem, 2.6vw, 2.3rem); letter-spacing: .14em; text-transform: uppercase;
+}
+.feature p { color: var(--ink-soft); font-size: .98rem; }
+.feature h2, .feature p { text-shadow: 0 1px 18px rgba(5,7,12,.95); }
+.final-title { text-shadow: 0 2px 40px rgba(5,7,12,.8); }
+.feature--b p { margin-left: auto; }
+.feature::before {               /* filet qui « relie » la carte à l'image */
+  content: ""; display: block; width: 44px; height: 1px; margin-bottom: 1.1rem;
+  background: linear-gradient(90deg, var(--blue), transparent);
+}
+.feature--b::before { margin-left: auto; background: linear-gradient(270deg, var(--blue), transparent); }
+.feature--c::before { margin-inline: auto; background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+
+/* SECTION 4 — FINAL : le titre au-dessus du logo formé par la vidéo, le bouton dessous */
+.chapter--final { grid-template-rows: auto 1fr auto; padding-top: 11vh; padding-bottom: 9vh; }
+.final-title {
+  opacity: 0;
+  font-family: var(--f-display); font-weight: 700;
+  font-size: clamp(2.3rem, 7.4vw, 7.2rem);
+  line-height: .95; letter-spacing: -.05em; text-transform: uppercase;
+}
+.final-btn {
+  grid-row: 3; opacity: 0; pointer-events: auto;
+  display: inline-flex; align-items: center; gap: .9rem;
+  padding: 1.05rem 2.1rem; border-radius: 999px;
+  font-family: var(--f-mono); font-size: .86rem; letter-spacing: .3em; text-transform: uppercase;
+  color: #06101F; background: linear-gradient(135deg, var(--blue-light), var(--blue) 70%);
+  box-shadow: 0 20px 60px -18px rgba(72,132,216,.65), inset 0 1px 0 rgba(255,255,255,.4);
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.final-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .4s var(--ease); }
+.final-btn:hover { transform: translateY(-2px); box-shadow: 0 26px 70px -18px rgba(72,132,216,.8), inset 0 1px 0 rgba(255,255,255,.45); }
+.final-btn:hover svg { transform: translateX(4px); }
+.final-btn:focus-visible { outline: 2px solid var(--blue-light); outline-offset: 4px; }
+
+/* Barre de progression du film */
+.progress { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(234,238,246,.06); }
+.progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-light)); transform-origin: left; transform: scaleX(var(--p)); }
+
+/* Pied de page après le film */
+.outro { display: grid; justify-items: center; gap: 1rem; padding: 18vh var(--pad) 12vh; text-align: center; color: var(--ink-soft); font-size: .92rem; }
+.outro-logo img { height: 26px; width: auto; display: block; }
+
+/* ---------------------------------------------------------------------
+   Mobile : mêmes effets, compositions resserrées.
+   --------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .chapter--hero { padding-top: 26vh; }
+  .feature { width: auto; left: var(--pad); right: var(--pad); text-align: center; margin: 0; }
+  .feature--a { top: 12%; }
+  .feature--b { top: auto; bottom: 30%; text-align: center; }
+  .feature--c { bottom: 9%; left: var(--pad); margin-left: 0; }
+  .feature::before, .feature--b::before { margin-inline: auto; background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+  .feature p { font-size: .9rem; }
+  .feature h2 { letter-spacing: .1em; }
+  .chapter--final { padding-top: 13vh; }
+}
+
+/* ---------------------------------------------------------------------
+   Mode statique (html sans .is-film) : « réduire les animations »,
+   JavaScript ou GSAP absents.
+   Pas d'épinglage ni de scrub : l'image finale en fond, les textes se
+   lisent dans l'ordre, sans aucun mouvement.
+   --------------------------------------------------------------------- */
+html:not(.is-film) .film, html:not(.is-film) .stage { height: auto; overflow: visible; }
+html:not(.is-film) .media { position: fixed; }
+html:not(.is-film) .video { display: none; }
+html:not(.is-film) .fallback {
+  opacity: 1;
+  background: url("media/poster-final.jpg") center / cover no-repeat, var(--bg);
+}
+html:not(.is-film) .chapter { position: relative; inset: auto; min-height: 100vh; min-height: 100svh; }
+html:not(.is-film) .chapter > *, html:not(.is-film) .story-line, html:not(.is-film) .feature,
+html:not(.is-film) .final-title, html:not(.is-film) .final-btn { opacity: 1 !important; transform: none !important; }
+html:not(.is-film) .chapter--story { gap: 2.5rem; align-content: center; }
+html:not(.is-film) .story-line { grid-area: auto; }
+html:not(.is-film) .chapter--feature { display: grid; gap: 3rem; align-content: center; justify-items: center; }
+html:not(.is-film) .feature { position: static; width: min(420px, 100%); margin: 0; text-align: center; }
+html:not(.is-film) .feature::before { margin-inline: auto; }
+html:not(.is-film) .hero-cue, html:not(.is-film) .progress { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-cue::after { animation: none; }
+  .final-btn, .final-btn svg { transition: none; }
+}

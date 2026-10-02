@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>The future is now — uploaded.be</title>
+  <meta name="description" content="A scroll-driven cinematic experience by uploaded.be." />
+  <!-- Page de démonstration : hors du plan du site, pas d'indexation -->
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#05070C" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Préchargement de la police d'affichage (auto-hébergée, aucune requête tierce) -->
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/bricolage-grotesque-latin.woff2" crossorigin />
+  <link rel="stylesheet" href="style.css?v=2" />
+  <!-- Active le mode « film » avant le premier affichage, sauf si le visiteur
+       a demandé à réduire les animations. Sans JavaScript, la page reste lisible. -->
+  <script>
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("is-film");
+  </script>
+</head>
+<body>
+  <!--
+    Structure
+    ─────────
+    #film       : la grande section défilante. ScrollTrigger l'épingle et
+                  transforme sa progression (0 → 1) en position dans la vidéo.
+    .stage      : l'écran fixe pendant l'épinglage (vidéo + textes).
+    .chapter    : quatre « chapitres » superposés (hero, story, feature, final),
+                  qui apparaissent et disparaissent selon la timeline.
+    Sans JavaScript, ou avec « réduire les animations », la page se lit
+    simplement de haut en bas (voir .is-static dans style.css).
+  -->
+  <main>
+    <section class="film" id="film" aria-label="The future is now">
+      <div class="stage">
+
+        <!-- Vidéo pilotée par le scroll : jamais lancée en lecture, jamais de contrôles.
+             La source (paysage ou portrait, MP4 ou WebM) est choisie par script.js. -->
+        <div class="media" aria-hidden="true">
+          <video class="video" muted playsinline preload="auto" disablepictureinpicture
+                 disableremoteplayback tabindex="-1"
+                 poster="media/poster.jpg"
+                 data-src-landscape="media/hero"
+                 data-src-portrait="media/hero-mobile"
+                 data-poster-portrait="media/poster-mobile.jpg"></video>
+          <!-- Repli élégant si la vidéo ne charge pas : halo animé par le scroll -->
+          <div class="fallback"></div>
+          <div class="veil"></div>
+        </div>
+
+        <!-- SECTION 1 — HERO -->
+        <div class="chapter chapter--hero">
+          <h1 class="hero-title">
+            <span class="line">The future</span>
+            <span class="line">is now</span>
+          </h1>
+          <p class="hero-sub">
+            <span>Scroll to explore</span>
+            <span class="hero-cue" aria-hidden="true"></span>
+          </p>
+        </div>
+
+        <!-- SECTION 2 — STORY -->
+        <div class="chapter chapter--story">
+          <p class="story-line" data-step="1">Designed for tomorrow.</p>
+          <p class="story-line" data-step="2">Engineered without compromise.</p>
+          <p class="story-line" data-step="3">Every detail matters.</p>
+        </div>
+
+        <!-- SECTION 3 — FEATURE : trois caractéristiques autour de la vidéo -->
+        <div class="chapter chapter--feature">
+          <div class="feature feature--a">
+            <span class="feature-n">01</span>
+            <h2>Performance</h2>
+            <p>Instant, everywhere. Built light, built fast.</p>
+          </div>
+          <div class="feature feature--b">
+            <span class="feature-n">02</span>
+            <h2>Design</h2>
+            <p>Every pixel placed on purpose. Nothing borrowed.</p>
+          </div>
+          <div class="feature feature--c">
+            <span class="feature-n">03</span>
+            <h2>Technology</h2>
+            <p>Native code, no bloat, ready for what comes next.</p>
+          </div>
+        </div>
+
+        <!-- SECTION 4 — FINAL -->
+        <div class="chapter chapter--final">
+          <h2 class="final-title">Ready for<br />what’s next?</h2>
+          <a class="final-btn" href="https://uploaded.be/">
+            <span>Explore</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+          </a>
+        </div>
+
+        <!-- Progression du film -->
+        <div class="progress" aria-hidden="true"><span></span></div>
+      </div>
+    </section>
+
+    <footer class="outro">
+      <a href="https://uploaded.be/" class="outro-logo"><img src="/img/logo-uploaded.webp" alt="uploaded.be" width="152" height="26" /></a>
+      <p>Websites &amp; apps, crafted by one person. Neupré · Liège.</p>
+    </footer>
+  </main>
+
+  <!-- GSAP + ScrollTrigger, auto-hébergés (licence standard gratuite de GSAP) -->
+  <script src="vendor/gsap.min.js" defer></script>
+  <script src="vendor/ScrollTrigger.min.js" defer></script>
+  <script src="script.js?v=2" defer></script>
+</body>
+</html>
